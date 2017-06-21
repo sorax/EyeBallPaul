@@ -1,7 +1,7 @@
 "use strict";
 
 
-
+/*
 function Player () {
 	// PUBLIC
 	this.name = '';
@@ -119,7 +119,7 @@ function GameJS () {
 
 			listHtml += '<li>' + player.name + '</li>';
 		});
-		*/
+
 		team1List.innerHTML = listHtml;
 	}
 
@@ -194,7 +194,7 @@ function ObserverJS () {
 		//canvas.addEventListener('click', onClick);
 	};
 
-	/.*
+
 	var onWindowResize = function () {
 		log('game: resize');
 		clear();
@@ -202,7 +202,7 @@ function ObserverJS () {
 		canvas.width = window.innerWidth;
 		//draw();
 	};
-*./
+
 	var draw = function () {
 		log('game: draw');
 		clear();
