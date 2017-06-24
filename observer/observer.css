@@ -8,9 +8,10 @@ body {
 	display: block;
 	height: 100%;
 	width: 100%;
-	background: #000;
+	background: #fff;
 }
 
+/*
 .team {
 	position: absolute;
 	top: 0;
@@ -33,3 +34,4 @@ body {
 .team li {
 	padding: 0.2em;
 }
+*/
