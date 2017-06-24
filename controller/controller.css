@@ -2,14 +2,12 @@ html {
 	background: #444;
 }
 
-body {
-	margin: 0;
-}
+body {}
 
 #name,
 #play,
 #deg {
-	/*width: 100%;*/
+	width: 100%;
 	border: none;
 	outline: none;
 	padding: 0;
@@ -21,6 +19,11 @@ body {
 	text-align: center;
 }
 
+#deg,
+#output {
+	display: none;
+}
+
 #name {
 	font-size: 20vh;
 }
@@ -30,5 +33,5 @@ body {
 }
 
 #deg {
-	display: none;
+	
 }

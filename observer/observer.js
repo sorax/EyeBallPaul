@@ -1,7 +1,54 @@
 "use strict";
 
 
+
+
+var canvas = $('#canvas').get(0);
+	canvas.height = window.innerHeight;
+	canvas.width = window.innerWidth;
+
+var context = canvas.getContext('2d');
+
+// male einen Kreis
+context.beginPath();
+context.strokeStyle = '#f00';
+context.fillStyle = context.strokeStyle;
+context.lineWidth = 5;
+context.arc(canvas.width/2,canvas.height/2,30,0,2*Math.PI);
+context.stroke();
+context.fill();
+
+var spieler1 = context;
+
+// male einen Bogen1
+context.beginPath();
+context.strokeStyle = '#0f0';
+context.arc(canvas.width/2,canvas.height/2,300,3,-0.95*Math.PI);
+context.stroke();
+
+var spieler2= context;
+
+// male einen Bogen2
+context.beginPath();
+context.strokeStyle = '#00f';
+context.arc(canvas.width/2,canvas.height/2,300,0,0.1*Math.PI);
+context.stroke();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*
+
 function Player () {
 	// PUBLIC
 	this.name = '';
@@ -119,7 +166,7 @@ function GameJS () {
 
 			listHtml += '<li>' + player.name + '</li>';
 		});
-
+		*./
 		team1List.innerHTML = listHtml;
 	}
 
@@ -194,7 +241,7 @@ function ObserverJS () {
 		//canvas.addEventListener('click', onClick);
 	};
 
-
+	/.*
 	var onWindowResize = function () {
 		log('game: resize');
 		clear();
@@ -202,7 +249,7 @@ function ObserverJS () {
 		canvas.width = window.innerWidth;
 		//draw();
 	};
-
+*./
 	var draw = function () {
 		log('game: draw');
 		clear();
