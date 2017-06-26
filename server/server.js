@@ -1,10 +1,10 @@
 'use strict';
 
 var wsPort = 63555;
-var pTitle = 'WebSocketServer';
+var pTitle = 'SocketServer';
 
 
-var users = [];
+//var users = [];
 
 
 var WebSocketServer = require('ws').Server,
@@ -14,9 +14,9 @@ process.title = pTitle;
 
 
 console.log('');
-console.log(process.title + ' up and running');
-console.log('pid: ' + process.pid);
-console.log('port: ' + wsPort);
+console.log(process.title + ' running');
+console.log('- pid: ' + process.pid);
+console.log('- port: ' + wsPort);
 
 
 
