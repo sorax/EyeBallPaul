@@ -1,12 +1,10 @@
 "use strict";
 
-
-
-
+var allDefenseSizePercent = 50;
+var teamDefenceSizePercent = allDefenseSizePercent / 2;
 var canvas = $('#canvas').get(0);
 	canvas.height = window.innerHeight;
 	canvas.width = window.innerWidth;
-
 var context = canvas.getContext('2d');
 
 // male einen Kreis
@@ -18,32 +16,23 @@ context.arc(canvas.width/2,canvas.height/2,30,0,2*Math.PI);
 context.stroke();
 context.fill();
 
-var spieler1 = context;
+// male spieler
+drawPlayer(30, '#f00');
+drawPlayer(90, '#00f');
 
-// male einen Bogen1
-context.beginPath();
-context.strokeStyle = '#0f0';
-context.arc(canvas.width/2,canvas.height/2,300,3,-0.95*Math.PI);
-context.stroke();
+function getRadiant (degrees) {
+	return degrees * Math.PI/180;
+}
 
-var spieler2= context;
+function drawPlayer (playerPosition, playerColor) {
+	var playerSize = 360 / (100 / teamDefenceSizePercent); // => 90°
+	var playerOffset = playerSize / 2;	// => 45°
 
-// male einen Bogen2
-context.beginPath();
-context.strokeStyle = '#00f';
-context.arc(canvas.width/2,canvas.height/2,300,0,0.1*Math.PI);
-context.stroke();
-
-
-
-
-
-
-
-
-
-
-
+	context.beginPath();
+	context.strokeStyle = playerColor;
+	context.arc(canvas.width/2, canvas.height/2, 300, getRadiant(playerPosition - playerOffset), getRadiant(playerPosition + playerOffset));
+	context.stroke();
+}
 
 
 

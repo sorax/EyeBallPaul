@@ -3,6 +3,17 @@ var wsPort = 63555;
 var socket;
 
 $(document).ready(function () {
+	$('#name').focus();
+
+	$('#name').on('keyup', function (event) {
+			//console.log(event);
+			if (event.originalEvent.keyCode == 13){
+					$('#play').click();
+			}
+
+	})
+
+
 	$('#play').on('click', function () {
 		var name = $('#name').val();
 
@@ -18,11 +29,11 @@ $(document).ready(function () {
 		}
 	});
 
-	$('#deg').on('change', function () {
+	$('#deg').on('change input', function () {
 		var value = $('#deg').val();
 		$('#output').val(value);
 
-		socket.send('hallo');
+		socket.send(value);
 	});
 });
 
