@@ -9,10 +9,11 @@ body {
 
 #log {
 	position: absolute;
-	top:0;
-	left: 0;
+	top: 0;
+	left: 50%;
 	font-size: 15vh;
 	background: rgba(127,127,127,0.5);
+	transform: translateX(-50%);
 }
 
 #name,
@@ -45,9 +46,9 @@ body {
 }
 
 #deg {
-	margin: 0;
-	height: 100vh;
+	margin: 50vh 0 0;
 	background: transparent;
+	transform: translateY(-50%);
 }
 
 input[type=range] {
