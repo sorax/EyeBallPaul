@@ -6,10 +6,10 @@ $(document).ready(function () {
 	$('#name').focus();
 
 	$('#name').on('keyup', function (event) {
-			//console.log(event);
-			if (event.originalEvent.keyCode == 13){
-					$('#play').click();
-			}
+		//console.log(event);
+		if (event.originalEvent.keyCode == 13) {
+			$('#play').click();
+		}
 
 	})
 
@@ -18,12 +18,11 @@ $(document).ready(function () {
 		var name = $('#name').val();
 
 		if (name == '') {
-			alert("bitte name ausfüllen");
+			alert("Bitte Name ausfüllen");
 		} else {
 			$('#name').css('display', 'none');
 			$('#play').css('display', 'none');
 			$('#deg').css('display', 'block');
-			$('#output').css('display', 'block');
 
 			connect();
 		}
@@ -31,17 +30,12 @@ $(document).ready(function () {
 
 	$('#deg').on('change input', function () {
 		var value = $('#deg').val();
-		$('#output').val(value);
+
+		log(value);
 
 		socket.send(value);
 	});
 });
-
-
-
-
-
-
 
 
 function connect() {
@@ -56,7 +50,6 @@ function connect() {
 	};
 
 
-
 	function send() {
 		var text = $('#text').val();
 		socket.send(text);
@@ -64,7 +57,7 @@ function connect() {
 		$('#text').val("");
 	}
 
-	function log (message) {
+	function log(message) {
 		$('#log').append(message + '</br>');
 	}
 
@@ -73,4 +66,9 @@ function connect() {
 			send();
 		}
 	});
+}
+
+
+function log (data) {
+	$('#log').html(data);
 }

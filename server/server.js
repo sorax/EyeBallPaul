@@ -8,7 +8,7 @@ var pTitle = 'SocketServer';
 
 
 var WebSocketServer = require('ws').Server,
-	wss = new WebSocketServer({ port: wsPort });
+	wss = new WebSocketServer({port: wsPort});
 
 process.title = pTitle;
 
@@ -17,7 +17,6 @@ console.log('');
 console.log(process.title + ' running');
 console.log('- pid: ' + process.pid);
 console.log('- port: ' + wsPort);
-
 
 
 wss.on('connection', function (ws) {
