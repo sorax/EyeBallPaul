@@ -4,8 +4,8 @@ var wsPort = 63555;
 var pTitle = 'SocketServer';
 
 
-//var users = [];
-
+var clients = [];
+var observer = [];
 
 var WebSocketServer = require('ws').Server,
 	wss = new WebSocketServer({port: wsPort});
@@ -19,29 +19,54 @@ console.log('- pid: ' + process.pid);
 console.log('- port: ' + wsPort);
 
 
-wss.on('connection', function (ws) {
+wss.on('connection', function (ws, req) {
 	console.log('client connected');
 	//console.log(ws);
 
+	var key = req.headers['sec-websocket-key'];
+	var ip = req.connection.remoteAddress;
+	clients[key] = {};
+	clients[key].ip = ip;
 
-	//ws.on('open', function open() {
-	//	console.log('connected');
-	//	ws.send(Date.now());
-	//});
+	ws.on('open', function open() {
+		//console.log('connected');
+	});
 
 	ws.on('close', function close() {
 		console.log('disconnected');
 	});
 
-	ws.on('message', function (message) {
+	ws.on('message', function (data) {
 		console.log('received data:');
-		console.log(message);
+		console.log(data);
 
-		ws.send('repeat: ' + message);
+		var message = JSON.parse(data);
+
+		if (message.clientType === 'observer') {
+			observer[key] = {};
+		} else {
+			clients[key].name = message.name;
+			clients[key].deg = message.deg;
+
+			// send client stat change to server
+			//ws.send('repeat: ' + data);
+
+
+			//observer
+
+			//wss.clients.forEach(function each(client) {
+			//	if (client !== ws && client.readyState === WebSocket.OPEN) {
+			//		client.send(data);
+			//	}
+			//});
+
+
+
+		}
 	});
 
-	ws.send('hello');
+	ws.send('welcome');
+	ws.send(Date.now());
 });
-
 
 //process.exit(0);

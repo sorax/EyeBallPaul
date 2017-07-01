@@ -1,14 +1,25 @@
-html { }
+html {
+	background: rgb(61,70,73);
+}
 
 body {
 	margin: 0;
+	font-family: sans-serif;
+}
+
+#log {
+	position: absolute;
+	top: 0;
+	left: 50%;
+	font-size: 15vh;
+	background: rgba(127,127,127,0.5);
+	transform: translateX(-50%);
 }
 
 #canvas {
 	display: block;
 	height: 100%;
 	width: 100%;
-	background: #fff;
 }
 
 /*

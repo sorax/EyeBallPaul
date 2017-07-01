@@ -1,4 +1,8 @@
-"use strict";
+'use strict';
+
+var wsIP = '127.0.0.1';
+var wsPort = 63555;
+var socket = new WebSocketServer(wsIP, wsPort);
 
 var allDefenseSizePercent = 50;
 var teamDefenceSizePercent = allDefenseSizePercent / 2;
@@ -10,16 +14,25 @@ var context = canvas.getContext('2d');
 
 // zeichne einen Kreis
 context.beginPath();
-context.strokeStyle = '#f00';
+context.strokeStyle = 'rgb(255,255,255)';
 context.fillStyle = context.strokeStyle;
-context.lineWidth = 5;
+context.lineWidth = 25;
+
 context.arc(canvas.width / 2, canvas.height / 2, 30, 0, 2 * Math.PI);
 context.stroke();
 context.fill();
 
 // zeichne spieler
-drawPlayer(30, '#f00');
-drawPlayer(90, '#00f');
+drawPlayer(30, 'rgba(0,176,111,0.7)');
+drawPlayer(90, 'rgba(239,59,31,0.7)');
+
+
+function Ball () {
+	var position = {
+		x: 0,
+		y: 0
+	}
+}
 
 
 function getRadiant(degrees) {
@@ -33,8 +46,58 @@ function drawPlayer(playerPosition, playerColor) {
 	context.beginPath();
 	context.strokeStyle = playerColor;
 	context.arc(canvas.width / 2, canvas.height / 2, 300, getRadiant(playerPosition - playerOffset), getRadiant(playerPosition + playerOffset));
+	context.lineCap = 'round';
 	context.stroke();
 }
+
+
+function log (data) {
+	console.log(data);
+	//$('#log').html(data);
+}
+
+
+function WebSocketServer () {
+	// PUBLIC
+	this.send = function (message) {
+		webSocket.send(JSON.stringify(message));
+	};
+
+	// PRIVATE
+	var wsIP = arguments[0],
+		wsPort = arguments[1];
+	var webSocket;
+	var that = this;
+
+	var init = function () {
+		webSocket = new WebSocket('ws://' + wsIP + ':' + wsPort);
+
+		webSocket.onopen = function () {
+			log('WebSocket status: ' + webSocket.readyState + ' (open)');
+			webSocket.send(JSON.stringify({clientType: 'observer'}));
+		};
+
+		webSocket.onmessage = function (message) {
+			log('WebSocket recieved: ' + message.data);
+		};
+
+		webSocket.onclose = function () {
+			log('WebSocket close');
+		};
+
+		webSocket.onerror = function (error) {
+			log('WebSocket error: ' + error);
+		};
+	};
+
+	// INIT
+	init();
+}
+
+
+
+
+
 
 
 /*
