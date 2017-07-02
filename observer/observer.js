@@ -7,19 +7,19 @@ var socket = new WebSocketServer(wsIP, wsPort);
 var allDefenseSizePercent = 50;
 var teamDefenceSizePercent = allDefenseSizePercent / 2;
 
+var teams = [];
+var players = [];
+
 var canvas = $('#canvas').get(0);
-canvas.height = window.innerHeight;
-canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	canvas.width = window.innerWidth;
 var context = canvas.getContext('2d');
+
 
 // zeichne einen Kreis
 context.beginPath();
-context.strokeStyle = 'rgb(255,255,255)';
-context.fillStyle = context.strokeStyle;
-context.lineWidth = 25;
-
-context.arc(canvas.width / 2, canvas.height / 2, 30, 0, 2 * Math.PI);
-context.stroke();
+context.fillStyle = 'rgb(255,255,255)';
+context.arc(canvas.width / 2, canvas.height / 2, 40, 0, 2 * Math.PI);
 context.fill();
 
 // zeichne spieler
@@ -45,7 +45,8 @@ function drawPlayer(playerPosition, playerColor) {
 
 	context.beginPath();
 	context.strokeStyle = playerColor;
-	context.arc(canvas.width / 2, canvas.height / 2, 300, getRadiant(playerPosition - playerOffset), getRadiant(playerPosition + playerOffset));
+	context.lineWidth = 40;
+	context.arc(canvas.width / 2, canvas.height / 2, 320, getRadiant(playerPosition - playerOffset), getRadiant(playerPosition + playerOffset));
 	context.lineCap = 'round';
 	context.stroke();
 }
@@ -56,6 +57,14 @@ function log (data) {
 	//$('#log').html(data);
 }
 
+/*
+function GameJS () {
+	// PUBLIC
+	this.pause = function () {
+		cancelAnimationFrame(animationFrameId);
+	}
+};
+*/
 
 function WebSocketServer () {
 	// PUBLIC
@@ -78,7 +87,11 @@ function WebSocketServer () {
 		};
 
 		webSocket.onmessage = function (message) {
-			log('WebSocket recieved: ' + message.data);
+			log('WebSocket recieved: ');
+			log(message.data);
+
+			//var player = JSON.parse(message);
+			//players[player.key] = player;
 		};
 
 		webSocket.onclose = function () {
@@ -102,19 +115,9 @@ function WebSocketServer () {
 
 /*
 
- function Player () {
- // PUBLIC
- this.name = '';
- this.deg = 0;
- }
-
-
 
  function GameJS () {
- // PUBLIC
- this.pause = function () {
- cancelAnimationFrame(animationFrameId)
- }
+
 
 
  this.addPlayer = function (player) {

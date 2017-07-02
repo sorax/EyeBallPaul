@@ -1,72 +1,71 @@
 'use strict';
 
 var wsPort = 63555;
-var pTitle = 'SocketServer';
-
 
 var clients = [];
-var observer = [];
+//var players = [];
+var observers = [];
 
 var WebSocketServer = require('ws').Server,
 	wss = new WebSocketServer({port: wsPort});
 
-process.title = pTitle;
+process.title = 'SocketServer';
 
-
-console.log('');
-console.log(process.title + ' running');
-console.log('- pid: ' + process.pid);
-console.log('- port: ' + wsPort);
-
+console.log(
+	process.title + ' started:'
+	+ '\n- port: ' + wsPort
+	+ '\n- pId: ' + process.pid
+	+ '\n- pTitle: ' + process.title
+);
 
 wss.on('connection', function (ws, req) {
-	console.log('client connected');
-	//console.log(ws);
-
 	var key = req.headers['sec-websocket-key'];
-	var ip = req.connection.remoteAddress;
+	//var ip = req.connection.remoteAddress;
+
+	console.log(
+		'New client connected:'
+		+ '\n- key: ' + key
+	);
+
 	clients[key] = {};
-	clients[key].ip = ip;
+	clients[key].key = key;
 
-	ws.on('open', function open() {
-		//console.log('connected');
-	});
-
-	ws.on('close', function close() {
-		console.log('disconnected');
+	ws.on('open', function open () {
+		console.log('open');
 	});
 
 	ws.on('message', function (data) {
-		console.log('received data:');
-		console.log(data);
+		//console.log(
+		//	'Received data from client:'
+		//	+ '\n' + data
+		//);
 
 		var message = JSON.parse(data);
 
 		if (message.clientType === 'observer') {
-			observer[key] = {};
+			clients[key].ws = ws;
+			observers.push(clients[key]);
+
+			console.log('observer connected');
 		} else {
 			clients[key].name = message.name;
 			clients[key].deg = message.deg;
+			//clients[key].team = '';
+			//clients[key].points = 0;
 
-			// send client stat change to server
-			//ws.send('repeat: ' + data);
-
-
-			//observer
-
-			//wss.clients.forEach(function each(client) {
-			//	if (client !== ws && client.readyState === WebSocket.OPEN) {
-			//		client.send(data);
-			//	}
-			//});
-
-
-
+			observers.forEach(function (observer) {
+				//if (observer.ws !== ws && observer.ws.readyState === WebSocket.OPEN) {}
+				observer.ws.send(JSON.stringify(clients[key]));
+			});
 		}
 	});
 
-	ws.send('welcome');
-	ws.send(Date.now());
+	ws.on('close', function close () {
+		console.log('Client disconnected');
+	});
+
+	//ws.send('welcome');
+	//ws.send(Date.now());
 });
 
 //process.exit(0);
