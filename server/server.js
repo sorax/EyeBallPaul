@@ -3,6 +3,7 @@
 var wsPort = 63555;
 
 var clients = [];
+//var teams = [];
 //var players = [];
 var observers = [];
 
@@ -44,7 +45,8 @@ wss.on('connection', function (ws, req) {
 
 		if (message.clientType === 'observer') {
 			clients[key].ws = ws;
-			observers.push(clients[key]);
+			//observers.push(clients[key]);
+			observers[key] = clients[key];
 
 			console.log('observer connected');
 		} else {
@@ -62,6 +64,7 @@ wss.on('connection', function (ws, req) {
 
 	ws.on('close', function close () {
 		console.log('Client disconnected');
+		delete clients[key];
 	});
 
 	//ws.send('welcome');

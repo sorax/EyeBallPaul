@@ -19,12 +19,12 @@ var context = canvas.getContext('2d');
 // zeichne einen Kreis
 context.beginPath();
 context.fillStyle = 'rgb(255,255,255)';
-context.arc(canvas.width / 2, canvas.height / 2, 40, 0, 2 * Math.PI);
+context.arc(canvas.width / 2, canvas.height / 2, 20, 0, 2 * Math.PI);
 context.fill();
 
 // zeichne spieler
-drawPlayer(30, 'rgba(0,176,111,0.7)');
-drawPlayer(90, 'rgba(239,59,31,0.7)');
+drawPlayer(-90, 'rgba(0,176,111,0.7)');
+//drawPlayer(70, 'rgba(239,59,31,0.7)');
 
 
 function Ball () {
@@ -39,6 +39,7 @@ function getRadiant(degrees) {
 	return degrees * Math.PI / 180;
 }
 
+
 function drawPlayer(playerPosition, playerColor) {
 	var playerSize = 360 / (100 / teamDefenceSizePercent); // => 90°
 	var playerOffset = playerSize / 2;	// => 45°
@@ -46,9 +47,42 @@ function drawPlayer(playerPosition, playerColor) {
 	context.beginPath();
 	context.strokeStyle = playerColor;
 	context.lineWidth = 40;
-	context.arc(canvas.width / 2, canvas.height / 2, 320, getRadiant(playerPosition - playerOffset), getRadiant(playerPosition + playerOffset));
 	context.lineCap = 'round';
+	context.arc(canvas.width / 2, canvas.height / 2, 320, getRadiant(playerPosition - playerOffset), getRadiant(playerPosition + playerOffset));
 	context.stroke();
+
+	context.beginPath();
+	context.strokeStyle = 'rgb(61,70,73)';
+	context.lineWidth = 10;
+	context.arc(canvas.width / 2, canvas.height / 2, 320, getRadiant(playerPosition-0.01), getRadiant(playerPosition+0.01));
+	context.stroke();
+}
+
+
+function requestanimfram () {
+	draw();
+}
+
+
+function clearCanvas () {
+	canvas.width = canvas.width;	// clears the canvas
+}
+
+
+function draw () {
+	clearCanvas();
+
+	console.log(players);
+
+	players.forEach(function (player, index) {
+		drawPlayer(player.deg, 'rgba(0,176,111,0.7)');
+	});
+
+
+	//var length = players.length;
+	//for (var i = 0, length; i < length; i++) {
+	//	drawPlayer(players[i].deg, 'rgba(0,176,111,0.7)');
+	//}
 }
 
 
@@ -87,11 +121,15 @@ function WebSocketServer () {
 		};
 
 		webSocket.onmessage = function (message) {
-			log('WebSocket recieved: ');
-			log(message.data);
+			//log('WebSocket recieved: ');
+			//log(message.data);
 
-			//var player = JSON.parse(message);
-			//players[player.key] = player;
+			var player = JSON.parse(message.data);
+			players[player.key] = player;
+
+			console.log(players);
+
+			requestanimfram();
 		};
 
 		webSocket.onclose = function () {
@@ -162,9 +200,7 @@ function WebSocketServer () {
  draw();
  };
 
- var clear = function () {
- canvas.width = canvas.width;	// clears the canvas
- };
+
 
  var draw = function () {
  clear();
@@ -210,10 +246,7 @@ function WebSocketServer () {
  var listHtml = '';
 
 
- var length = players.length;
- for (var i = 0, length; i < length; i++) {
- alert(i);
- }
+
 
 
  /*
@@ -222,7 +255,7 @@ function WebSocketServer () {
 
  listHtml += '<li>' + player.name + '</li>';
  });
- *./
+
  team1List.innerHTML = listHtml;
  }
 
