@@ -36,10 +36,10 @@ wss.on('connection', function (ws, req) {
 	});
 
 	ws.on('message', function (data) {
-		//console.log(
-		//	'Received data from client:'
-		//	+ '\n' + data
-		//);
+		console.log(
+			'Received data from client:'
+			+ '\n' + data
+		);
 
 		var message = JSON.parse(data);
 
@@ -54,6 +54,8 @@ wss.on('connection', function (ws, req) {
 			clients[key].deg = message.deg;
 			//clients[key].team = '';
 			//clients[key].points = 0;
+
+			console.log(observers);
 
 			observers.forEach(function (observer) {
 				//if (observer.ws !== ws && observer.ws.readyState === WebSocket.OPEN) {}
