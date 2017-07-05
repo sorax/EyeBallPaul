@@ -4,8 +4,8 @@ var wsPort = 63555;
 
 var clients = [];
 //var teams = [];
-//var players = [];
-var observers = [];
+var players = [];
+var observers = {};
 
 var WebSocketServer = require('ws').Server,
 	wss = new WebSocketServer({port: wsPort});
@@ -17,60 +17,52 @@ console.log(
 	+ '\n- port: ' + wsPort
 	+ '\n- pId: ' + process.pid
 	+ '\n- pTitle: ' + process.title
+	+ '\n'
 );
 
 wss.on('connection', function (ws, req) {
-	var key = req.headers['sec-websocket-key'];
+	var id = req.headers['sec-websocket-key'];
 	//var ip = req.connection.remoteAddress;
 
-	console.log(
-		'New client connected:'
-		+ '\n- key: ' + key
-	);
+	console.log('New client connected (id: ' + id + ')');
 
-	clients[key] = {};
-	clients[key].key = key;
-
-	ws.on('open', function open () {
-		console.log('open');
-	});
+	clients[id] = {};
+	clients[id].id = id;
 
 	ws.on('message', function (data) {
-		console.log(
-			'Received data from client:'
-			+ '\n' + data
-		);
+		console.log('Received data from client:' + data);
 
 		var message = JSON.parse(data);
 
 		if (message.clientType === 'observer') {
-			clients[key].ws = ws;
-			//observers.push(clients[key]);
-			observers[key] = clients[key];
+			observers[id] = clients[id];
+			observers[id].ws = ws;
 
 			console.log('observer connected');
 		} else {
-			clients[key].name = message.name;
-			clients[key].deg = message.deg;
-			//clients[key].team = '';
-			//clients[key].points = 0;
+			players[id] = clients[id];
+			players[id].name = message.name;
+			players[id].deg = message.deg;
+			players[id].team = 1;
+			players[id].points = 0;
 
-			console.log(observers);
-
-			observers.forEach(function (observer) {
-				//if (observer.ws !== ws && observer.ws.readyState === WebSocket.OPEN) {}
-				observer.ws.send(JSON.stringify(clients[key]));
-			});
+			for (var key in observers) {
+				//if (observer.ws !== ws && observer.ws.readyState === WebSocketServer.OPEN) {
+					var observer = observers[key];
+					var data = JSON.stringify(players[id]);
+					console.log('Send data to observers: ' + data);
+					observer.ws.send(data);
+				//}
+			}
 		}
 	});
 
 	ws.on('close', function close () {
-		console.log('Client disconnected');
-		delete clients[key];
+		console.log('Client disconnected  (id: ' + id + ')');
+		delete clients[id];
+		delete players[id];
+		delete observers[id];
 	});
-
-	//ws.send('welcome');
-	//ws.send(Date.now());
 });
 
 //process.exit(0);

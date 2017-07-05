@@ -33,21 +33,16 @@ $(document).ready(function () {
 		}
 	});
 
-	$('#deg').on('change input', function () {
-		var value = $('#deg').val();
-
-		socket.send({
+	$('#deg').on('input', function () {
+		var message = {
 			name: playerName,
-			deg: value
-		});
+			deg: $(this).val()
+		};
+		console.log(message);
+
+		socket.send(message);
 	});
 });
-
-
-function log (data) {
-	console.log(data);
-	//$('#log').html(data);
-}
 
 
 function WebSocketServer () {
@@ -60,25 +55,20 @@ function WebSocketServer () {
 	var wsIP = arguments[0],
 		wsPort = arguments[1];
 	var webSocket;
-	var that = this;
 
 	var init = function () {
 		webSocket = new WebSocket('ws://' + wsIP + ':' + wsPort);
 
 		webSocket.onopen = function () {
-			log('WebSocket open: (' + webSocket.readyState + ')');
-		};
-
-		webSocket.onmessage = function (message) {
-			log('WebSocket recieved: ' + message.data);
+			console.log('WebSocket open: (' + webSocket.readyState + ')');
 		};
 
 		webSocket.onclose = function () {
-			log('WebSocket close');
+			console.log('WebSocket close');
 		};
 
 		webSocket.onerror = function (error) {
-			log('WebSocket error: ' + error);
+			console.log('WebSocket error: ' + error);
 		};
 	};
 
