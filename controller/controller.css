@@ -7,6 +7,7 @@ body {
 	margin: 0;
 	height: 100%;
 	font-family: sans-serif;
+	-webkit-text-size-adjust: 100%;
 }
 
 #name,

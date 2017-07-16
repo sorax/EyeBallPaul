@@ -26,18 +26,10 @@ function ObserverJS () {
 	// PUBLIC FUNCTIONS
 	this.draw = function () {
 		that.clear();
-		that.drawBall();
+		that.ball.draw();
 		that.drawPlayers();
 
-		requestAnimationFrame(that.draw);
-	};
-
-	this.drawBall = function () {
-		// zeichne einen Kreis
-		context.beginPath();
-		context.fillStyle = 'rgb(255,255,255)';
-		context.arc(canvas.width / 2, canvas.height / 2, 20, 0, 2 * Math.PI);
-		context.fill();
+		//animationFrameId = requestAnimationFrame(that.draw);
 	};
 
 	this.drawPlayers = function () {
@@ -68,10 +60,12 @@ function ObserverJS () {
 
 	// PRIVATE VARIABLES
 	var that = this,
+		ball,
 		animationFrameId;
 
 	// PRIVATE FUNCTIONS
 	var init = function () {
+		that.ball = new Ball();
 		that.draw();
 	};
 
@@ -87,6 +81,74 @@ function Player (id, name, deg) {
 	this.color = 'rgba(0,176,111,0.7)';
 	//this.team = 1;
 	//this.points = 5;
+}
+
+
+function Ball () {
+
+	// PUBLIC VARIABLES
+	this.x = 0;
+	this.y = 0;
+	this.deg = 0;
+	this.speed = 1;
+	this.color = 'rgb(255,255,255)';
+
+	// PUBLIC FUNCTIONS
+	this.draw = function () {
+		this.x += Math.cos(getRadiant(this.deg)) * this.speed;
+		this.y += Math.sin(getRadiant(this.deg)) * this.speed;
+
+		//console.log(this.x + ' | ' + this.y);
+
+		var testColor = context.getImageData(Math.round(this.x), Math.round(this.y), 1, 1).data;
+		//var testColor = context.getImageData(0, 0, 1, 1).data;
+
+
+		console.log(testColor);
+
+		context.beginPath();
+		context.fillStyle = this.color;
+		context.arc((canvas.width / 2) + this.x, (canvas.height / 2) + this.y, 20, 0, 2 * Math.PI);
+		context.fill();
+	};
+
+	var that = this;
+
+	var collisionTest = function () {
+		var distanceFromCenter = Math.round(Math.sqrt((that.x * that.x) + (that.y * that.y)));
+
+
+		if (distanceFromCenter >= 280) {
+			//hasLeft();
+			hasHitAPaddle();
+		}
+
+		return distanceFromCenter;
+	};
+
+	var hasLeft = function () {
+
+	};
+
+	var hasHitAPaddle = function () {
+		//that.x = 0;
+		//that.y = 0;
+
+		that.deg = Math.random() * 360;
+	}
+
+/*
+	var imgData = context.getImageData(0, 0, canvas.width, canvas.height);
+	// invert colors
+	for (var i = 0; i < imgData.data.length; i += 4) {
+		imgData.data[i] = 255-imgData.data[i];
+		imgData.data[i+1] = 255-imgData.data[i+1];
+		imgData.data[i+2] = 255-imgData.data[i+2];
+		imgData.data[i+3] = 255;
+	}
+ 	context.putImageData(imgData,0,0);
+*/
+
 }
 
 
