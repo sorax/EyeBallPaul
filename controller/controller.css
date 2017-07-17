@@ -1,18 +1,28 @@
 html {
-	height: 100%;
-	background: rgb(61,70,73);
+	background: rgb(0,0,0);
 }
 
 body {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow: hidden;
 	margin: 0;
-	height: 100%;
 	font-family: sans-serif;
+	background: rgb(61,70,73);
 	-webkit-text-size-adjust: 100%;
 }
 
 #name,
 #play,
 #deg {
+	position: absolute;
+	left: 0;
+	right: 0;
+	margin: 0;
+	height: 50vh;
 	width: 100%;
 	padding: 0;
 	border: none;
@@ -23,24 +33,23 @@ body {
 #name,
 #play {
 	display: block;
-	height: 50vh;
 	text-align: center;
+}
+
+#name {
+	top: 0;
+	font-size: 15vh;
+}
+
+#play {
+	color: #fff;
+	bottom: 0;
+	font-size: 10vh;
 }
 
 #deg {
 	display: none;
-}
-
-#name {
-	font-size: 20vh;
-}
-
-#play {
-	font-size: 15vh;
-}
-
-#deg {
-	margin: 50vh 0 0;
+	top: 50%;
 	background: transparent;
 	transform: translateY(-50%);
 }

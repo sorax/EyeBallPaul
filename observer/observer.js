@@ -25,15 +25,27 @@ function ObserverJS () {
 
 	// PUBLIC FUNCTIONS
 	this.draw = function () {
-		that.clear();
-		that.ball.draw();
-		that.drawPlayers();
+		clear();
+		ball.draw();
+		drawPlayers();
 
 		//animationFrameId = requestAnimationFrame(that.draw);
 	};
 
-	this.drawPlayers = function () {
-		this.players.forEach(function (player, index) {
+
+
+	// PRIVATE VARIABLES
+	var that = this,
+		ball,
+		animationFrameId;
+
+	// PRIVATE FUNCTIONS
+	var clear = function () {
+		canvas.width = canvas.width;	// clears the canvas
+	};
+
+	var drawPlayers = function () {
+		that.players.forEach(function (player, index) {
 			var playerPosition = player.deg;
 
 			var playerSize = 360 / (100 / teamDefenceSizePercent); // => 90°
@@ -53,19 +65,8 @@ function ObserverJS () {
 			context.stroke();
 		});
 	};
-
-	this.clear = function () {
-		canvas.width = canvas.width;	// clears the canvas
-	};
-
-	// PRIVATE VARIABLES
-	var that = this,
-		ball,
-		animationFrameId;
-
-	// PRIVATE FUNCTIONS
 	var init = function () {
-		that.ball = new Ball();
+		ball = new Ball();
 		that.draw();
 	};
 
@@ -81,6 +82,10 @@ function Player (id, name, deg) {
 	this.color = 'rgba(0,176,111,0.7)';
 	//this.team = 1;
 	//this.points = 5;
+
+	this.draw = function (context) {
+
+	};
 }
 
 
