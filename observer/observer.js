@@ -29,7 +29,7 @@ function ObserverJS () {
 		ball.draw();
 		drawPlayers();
 
-		//animationFrameId = requestAnimationFrame(that.draw);
+		animationFrameId = requestAnimationFrame(that.draw);
 	};
 
 
@@ -96,7 +96,8 @@ function Ball () {
 	this.y = 0;
 	this.deg = 0;
 	this.speed = 1;
-	this.color = 'rgb(255,255,255)';
+	this.colors = ['rgb(255,255,255)', 'rgb(0,176,111)', 'rgb(255,66,0)'];
+	this.color = this.colors[0];
 
 	// PUBLIC FUNCTIONS
 	this.draw = function () {
@@ -105,11 +106,13 @@ function Ball () {
 
 		//console.log(this.x + ' | ' + this.y);
 
-		var testColor = context.getImageData(Math.round(this.x), Math.round(this.y), 1, 1).data;
+		collisionTest();
+
+		//var testColor = context.getImageData(Math.round(this.x), Math.round(this.y), 1, 1).data;
 		//var testColor = context.getImageData(0, 0, 1, 1).data;
 
 
-		console.log(testColor);
+		//console.log(testColor);
 
 		context.beginPath();
 		context.fillStyle = this.color;
@@ -122,6 +125,7 @@ function Ball () {
 	var collisionTest = function () {
 		var distanceFromCenter = Math.round(Math.sqrt((that.x * that.x) + (that.y * that.y)));
 
+		console.log('distanceFromCenter: ' + distanceFromCenter);
 
 		if (distanceFromCenter >= 280) {
 			//hasLeft();
@@ -138,8 +142,11 @@ function Ball () {
 	var hasHitAPaddle = function () {
 		//that.x = 0;
 		//that.y = 0;
+		that.speed = 0;
+		that.color = that.colors[2];
 
-		that.deg = Math.random() * 360;
+		//that.deg = Math.round(Math.random() * 30 + 180);
+		//Math.floor(Math.random() * 40) - 20;
 	}
 
 /*
