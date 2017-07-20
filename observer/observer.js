@@ -92,6 +92,7 @@ function Player (id, name, deg) {
 function Ball () {
 
 	// PUBLIC VARIABLES
+	this.radius = 20;
 	this.x = 0;
 	this.y = 0;
 	this.deg = 0;
@@ -104,35 +105,37 @@ function Ball () {
 		this.x += Math.cos(getRadiant(this.deg)) * this.speed;
 		this.y += Math.sin(getRadiant(this.deg)) * this.speed;
 
-		//console.log(this.x + ' | ' + this.y);
-
-		collisionTest();
-
-		//var testColor = context.getImageData(Math.round(this.x), Math.round(this.y), 1, 1).data;
-		//var testColor = context.getImageData(0, 0, 1, 1).data;
-
-
-		//console.log(testColor);
-
 		context.beginPath();
 		context.fillStyle = this.color;
-		context.arc((canvas.width / 2) + this.x, (canvas.height / 2) + this.y, 20, 0, 2 * Math.PI);
+		context.arc((canvas.width / 2) + this.x, (canvas.height / 2) + this.y, this.radius, 0, 2 * Math.PI);
 		context.fill();
+
+		collisionTest(this.x + 50, this.y);
 	};
 
 	var that = this;
 
-	var collisionTest = function () {
-		var distanceFromCenter = Math.round(Math.sqrt((that.x * that.x) + (that.y * that.y)));
+	var collisionTest = function (x, y) {
+		// draw circle on collision-test-point
+		//context.beginPath();
+		//context.fillStyle = 'rgb(255,0,0)';
+		//context.arc((canvas.width / 2) + x, (canvas.height / 2) + y, 3, 0, Math.PI * 2);
+		//context.fill();
 
-		console.log('distanceFromCenter: ' + distanceFromCenter);
+
+		var distanceFromCenter = Math.round(Math.sqrt((that.x * that.x) + (that.y * that.y)));
+		//console.log('distanceFromCenter: ' + distanceFromCenter);
 
 		if (distanceFromCenter >= 280) {
+			//var testColor = context.getImageData(0, 0, 1, 1).data;
+			//var testColor = context.getImageData((canvas.width / 2) + x, (canvas.height / 2) + y, 1, 1).data;
+			//console.log(testColor);
+
+
+
 			//hasLeft();
 			hasHitAPaddle();
 		}
-
-		return distanceFromCenter;
 	};
 
 	var hasLeft = function () {
@@ -142,10 +145,13 @@ function Ball () {
 	var hasHitAPaddle = function () {
 		//that.x = 0;
 		//that.y = 0;
-		that.speed = 0;
-		that.color = that.colors[2];
+		that.speed += 1;
+		//that.color = that.colors[2];
 
+		that.deg += 180;
 		//that.deg = Math.round(Math.random() * 30 + 180);
+
+
 		//Math.floor(Math.random() * 40) - 20;
 	}
 
