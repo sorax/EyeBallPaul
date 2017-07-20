@@ -95,7 +95,7 @@ function Ball () {
 	this.radius = 20;
 	this.x = 0;
 	this.y = 0;
-	this.deg = 0;
+	this.deg = Math.random()*360;
 	this.speed = 1;
 	this.colors = ['rgb(255,255,255)', 'rgb(0,176,111)', 'rgb(255,66,0)'];
 	this.color = this.colors[0];
@@ -110,7 +110,7 @@ function Ball () {
 		context.arc((canvas.width / 2) + this.x, (canvas.height / 2) + this.y, this.radius, 0, 2 * Math.PI);
 		context.fill();
 
-		collisionTest(this.x + 50, this.y);
+		collisionTest(this.x, this.y);
 	};
 
 	var that = this;
@@ -139,16 +139,22 @@ function Ball () {
 	};
 
 	var hasLeft = function () {
+		that.x = 0;
+		that.y = 0;
+		that.speed = 1;
+		that.color = that.colors[0];
 
 	};
 
 	var hasHitAPaddle = function () {
-		//that.x = 0;
-		//that.y = 0;
 		that.speed += 1;
-		//that.color = that.colors[2];
+		if (that.color == that.colors[2]) {
+			that.color = that.colors[1];
+		} else {
+			that.color = that.colors[2];
+		}
 
-		that.deg += 180;
+		that.deg = Math.random()*360;
 		//that.deg = Math.round(Math.random() * 30 + 180);
 
 
