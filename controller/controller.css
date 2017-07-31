@@ -17,7 +17,8 @@ body {
 
 #name,
 #play,
-#deg {
+#deg,
+#log {
 	position: absolute;
 	left: 0;
 	right: 0;
@@ -52,6 +53,16 @@ body {
 	bottom: 25%;
 	background: transparent;
 }
+	#deg.team1 {}
+	#deg.team2 {}
+
+#log {
+	display: none;
+	top: 0;
+	left: 0;
+	right: 0;
+	text-align: center;
+}
 
 input[type=range] {
 	width: 100%;
@@ -73,11 +84,18 @@ input[type=range]::-webkit-slider-thumb {
 	height: 20vh;
 	width: 20vh;
 	border-radius: 100%;
-	background: rgb(0,176,111);
+	background: rgb(255,255,255);
 	cursor: pointer;
 	-webkit-appearance: none;
 	margin-top: -5vh;
 }
+
+	input[type=range].team1::-webkit-slider-thumb {
+		background: rgb(0,176,111);
+	}
+	input[type=range].team2::-webkit-slider-thumb {
+		background: rgb(255,66,0);
+	}
 
 input[type=range]:focus::-webkit-slider-runnable-track {
 	background: rgb(45,47,49);
@@ -94,6 +112,13 @@ input[type=range]::-moz-range-thumb {
 	height: 20vh;
 	width: 20vh;
 	border-radius: 100%;
-	background: rgb(0,176,111);
+	background: rgb(255,255,255);
 	cursor: pointer;
 }
+
+	input[type=range].team1::-moz-range-thumb {
+		background: rgb(0,176,111);
+	}
+	input[type=range].team2::-moz-range-thumb {
+		background: rgb(255,66,0);
+	}

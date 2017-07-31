@@ -192,8 +192,13 @@ function WebSocketServer () {
 		webSocket = new WebSocket('ws://' + wsIP + ':' + wsPort);
 
 		webSocket.onopen = function () {
-			console.log('WebSocket status: ' + webSocket.readyState + ' (open)');
-			webSocket.send(JSON.stringify({clientType: 'observer'}));
+			console.log('WebSocket open: (' + webSocket.readyState + ')');
+
+			var message = {
+				type: 'setClientType',
+				clientType: 'observer'
+			};
+			that.send(message);
 		};
 
 		webSocket.onmessage = function (message) {
