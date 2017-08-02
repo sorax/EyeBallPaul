@@ -73,28 +73,17 @@ wss.on('connection', function (ws, req) {
 			case 'setDeg':
 				players[id].deg = message.deg;
 
-
-
-
-				//console.log(players);
-
-				/*var message = {
-					team: players[id].team,
-					points: players[id].deg
-				};
-				ws.send(JSON.stringify(message));*/
-
 				for (var key in players) {
 					var player = players[key];
-					//console.log('holl?');
-					//console.log(players[key].ws);
-
 
 					var message = {
-						test: '123'
+						team: player.team,
+						points: player.points
 					};
-					ws.send(JSON.stringify(message));
+					//ws.send(JSON.stringify(message));
+					player.ws.send(JSON.stringify(message));
 
+					console.log(player.ws);
 				}
 			break;
 
