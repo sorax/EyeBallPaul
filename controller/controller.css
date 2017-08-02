@@ -58,9 +58,11 @@ body {
 
 #log {
 	display: none;
-	top: 0;
+	top: 5vh;
 	left: 0;
 	right: 0;
+	color: rgb(255,255,255);
+	font-size: 5vh;
 	text-align: center;
 }
 
