@@ -40,7 +40,7 @@ $(document).ready(function () {
 			type: 'setDeg',
 			deg: $(this).val()
 		};
-		console.log(message);
+		//console.log(message);
 
 		socket.send(message);
 	});

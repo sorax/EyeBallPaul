@@ -57,11 +57,11 @@ wss.on('connection', function (ws, req) {
 							teams[2][id] = players[id];
 						}
 
-						var message = {
+						var data = {
 							team: players[id].team,
 							points: players[id].points
 						};
-						ws.send(JSON.stringify(message));
+						ws.send(JSON.stringify(data));
 					break;
 
 					case 'observer':
@@ -73,17 +73,14 @@ wss.on('connection', function (ws, req) {
 			case 'setDeg':
 				players[id].deg = message.deg;
 
-				for (var key in players) {
-					var player = players[key];
+				for (var key in observers) {
+					var observer = observers[key];
 
 					var message = {
-						team: player.team,
-						points: player.points
+						type: 'updatePlayer',
+						player: players[id]
 					};
-					//ws.send(JSON.stringify(message));
-					player.ws.send(JSON.stringify(message));
-
-					console.log(player.ws);
+					observer.ws.send(JSON.stringify(message));
 				}
 			break;
 
@@ -115,14 +112,7 @@ wss.on('connection', function (ws, req) {
 /*
 	ws.on('message', function (data) {
 
-			for (var key in observers) {
-				//if (observer.ws !== ws && observer.ws.readyState === WebSocketServer.OPEN) {
-					var observer = observers[key];
-					var data = JSON.stringify(players[id]);
-					console.log('Send data to observers: ' + data);
-					observer.ws.send(data);
-				//}
-			}
+
 		}
 	});
 */
