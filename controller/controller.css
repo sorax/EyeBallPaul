@@ -1,43 +1,94 @@
 html {
+	height: 100%;
 	background: rgb(0,0,0);
 }
 
 body {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	overflow: hidden;
 	margin: 0;
+	height: 100%;
 	font-family: sans-serif;
 	background: rgb(61,70,73);
+	overflow: hidden;
 	-webkit-text-size-adjust: 100%;
+
 }
 
+#connection {
+	display: block;
+	height: 100%;
+	line-height: 100vh;
+	color: #eee;
+	font-size: 10vw;
+	text-align: center;
+}
+
+#login {
+	display: none;
+}
+
+	#login-name {
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		text-align: center;
+		height: 50vh;
+		border: none;
+		font-size: 10vw;
+	}
+
+	#login-send {
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		text-align: center;
+		height: 50vh;
+		border: none;
+		font-size: 10vw;
+	}
+
+		#login-send.team1 {
+			color: #fff;
+			background: rgb(0,176,111);
+		}
+
+		#login-send.team2 {
+			color: #fff;
+			background: rgb(255,66,0);
+		}
+
+
+#play {
+	display: none;
+	height: 100%;
+}
+
+	#play-deg {
+		position: relative;
+		top: 50%;
+		margin: 0;
+		transform: translateY(-50%);
+
+	}
+
+/*
+#log {
+	display: none;
+}
+*/
+
+
+/*
 #name,
 #play,
 #deg,
 #log {
-	position: absolute;
-	left: 0;
-	right: 0;
-	margin: 0;
-	padding: 0;
 	border: none;
-	border-radius: 0;
+
 	outline: none;
 }
 
-#name,
-#play {
-	display: block;
-	text-align: center;
-	height: 50vh;
-}
 
 #name {
-	top: 0;
 	font-size: 15vh;
 }
 
@@ -49,8 +100,6 @@ body {
 
 #deg {
 	display: none;
-	top: 25%;
-	bottom: 25%;
 	background: transparent;
 }
 	#deg.team1 {}
@@ -65,6 +114,9 @@ body {
 	font-size: 5vh;
 	text-align: center;
 }
+*/
+
+
 
 input[type=range] {
 	width: 100%;
