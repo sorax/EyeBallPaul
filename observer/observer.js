@@ -3,219 +3,123 @@
 var wsIP = '127.0.0.1';
 var wsPort = 63555;
 
-var allDefenseSizePercent = 50;
-var teamDefenceSizePercent = allDefenseSizePercent / 2;
+var observer = new Observer(),
+	webSocket;
 
-var teams = [];
-var players = [];
+$(document).ready(function () {
+	observer.init({wsIP: wsIP, wsPort: wsPort});
+});
 
-var canvas = $('#canvas').get(0);
-	canvas.height = window.innerHeight;
-	canvas.width = window.innerWidth;
-var context = canvas.getContext('2d');
+function Observer () {
+	// PUBLIC
+	this.onDataReceived = function (data) {
+		//console.log('Received: ', data);
+		switch (data.type) {
+			case 'updatePlayer':
+				var player = data.player;
+				players[player.id] = player;
 
-var observer = new ObserverJS();
-var socket = new WebSocketServer(wsIP, wsPort);
-
-
-function ObserverJS () {
-
-	// PUBLIC VARIABLES
-	this.players = [];
-
-	// PUBLIC FUNCTIONS
-	this.draw = function () {
-		clear();
-		ball.draw();
-		drawPlayers();
-
-		animationFrameId = requestAnimationFrame(that.draw);
+				console.log(players);
+			break;
+		}
 	};
 
+	this.onConnectionEstablished = function () {
+		$('#connection').css('display', 'none');
+		$('#display').css('display', 'block');
 
-
-	// PRIVATE VARIABLES
-	var that = this,
-		ball,
-		animationFrameId;
-
-	// PRIVATE FUNCTIONS
-	var clear = function () {
-		canvas.width = canvas.width;	// clears the canvas
-	};
-
-	var drawPlayers = function () {
-		that.players.forEach(function (player, index) {
-			var playerPosition = player.deg;
-
-			var playerSize = 360 / (100 / teamDefenceSizePercent); // => 90°
-			var playerOffset = playerSize / 2;	// => 45°
-
-			context.beginPath();
-			context.strokeStyle = player.color;
-			context.lineWidth = 40;
-			context.lineCap = 'round';
-			context.arc(canvas.width / 2, canvas.height / 2, 320, getRadiant(playerPosition - playerOffset), getRadiant(playerPosition + playerOffset));
-			context.stroke();
-
-			context.beginPath();
-			context.strokeStyle = 'rgb(61,70,73)';
-			context.lineWidth = 10;
-			context.arc(canvas.width / 2, canvas.height / 2, 320, getRadiant(playerPosition-0.01), getRadiant(playerPosition+0.01));
-			context.stroke();
+		// Set client type
+		webSocket.send({
+			type: 'setClientType',
+			clientType: 'observer'
 		});
 	};
-	var init = function () {
-		ball = new Ball();
-		that.draw();
+
+	this.onConnectionClosed = function () {
+		$('#connection').css('display', 'block');
+		$('#display').css('display', 'none');
 	};
 
-	// INIT
-	init();
+	this.init = function (config) {
+		webSocket = new WebSocketClient(config.wsIP, config.wsPort);
+	};
+
+	// PRIVATE
+	var players = {};
 }
 
-
-function Player (id, name, deg) {
-	this.id = id;
-	this.name = name;
-	this.deg = deg;
-	this.color = 'rgba(0,176,111,0.7)';
-	//this.team = 1;
-	//this.points = 5;
-
-	this.draw = function (context) {
-
-	};
-}
-
-
-function Ball () {
-
-	// PUBLIC VARIABLES
-	this.radius = 20;
-	this.x = 0;
-	this.y = 0;
-	this.deg = Math.random()*360;
-	this.speed = 1;
-	this.colors = ['rgb(255,255,255)', 'rgb(0,176,111)', 'rgb(255,66,0)'];
-	this.color = this.colors[0];
-
-	// PUBLIC FUNCTIONS
-	this.draw = function () {
-		this.x += Math.cos(getRadiant(this.deg)) * this.speed;
-		this.y += Math.sin(getRadiant(this.deg)) * this.speed;
-
-		context.beginPath();
-		context.fillStyle = this.color;
-		context.arc((canvas.width / 2) + this.x, (canvas.height / 2) + this.y, this.radius, 0, 2 * Math.PI);
-		context.fill();
-
-		collisionTest(this.x, this.y);
-	};
-
-	var that = this;
-
-	var collisionTest = function (x, y) {
-		// draw circle on collision-test-point
-		//context.beginPath();
-		//context.fillStyle = 'rgb(255,0,0)';
-		//context.arc((canvas.width / 2) + x, (canvas.height / 2) + y, 3, 0, Math.PI * 2);
-		//context.fill();
-
-
-		var distanceFromCenter = Math.round(Math.sqrt((that.x * that.x) + (that.y * that.y)));
-		//console.log('distanceFromCenter: ' + distanceFromCenter);
-
-		if (distanceFromCenter >= 280) {
-			//var testColor = context.getImageData(0, 0, 1, 1).data;
-			//var testColor = context.getImageData((canvas.width / 2) + x, (canvas.height / 2) + y, 1, 1).data;
-			//console.log(testColor);
-
-
-
-			//hasLeft();
-			hasHitAPaddle();
-		}
-	};
-
-	var hasLeft = function () {
-		that.x = 0;
-		that.y = 0;
-		that.speed = 1;
-		that.color = that.colors[0];
-
-	};
-
-	var hasHitAPaddle = function () {
-		that.speed += 1;
-		if (that.color == that.colors[2]) {
-			that.color = that.colors[1];
-		} else {
-			that.color = that.colors[2];
-		}
-
-		that.deg = Math.random()*360;
-		//that.deg = Math.round(Math.random() * 30 + 180);
-
-
-		//Math.floor(Math.random() * 40) - 20;
-	}
-
-/*
-	var imgData = context.getImageData(0, 0, canvas.width, canvas.height);
-	// invert colors
-	for (var i = 0; i < imgData.data.length; i += 4) {
-		imgData.data[i] = 255-imgData.data[i];
-		imgData.data[i+1] = 255-imgData.data[i+1];
-		imgData.data[i+2] = 255-imgData.data[i+2];
-		imgData.data[i+3] = 255;
-	}
- 	context.putImageData(imgData,0,0);
-*/
-
-}
-
-
-function WebSocketServer () {
+function WebSocketClient () {
 	// PUBLIC
-	this.send = function (message) {
-		webSocket.send(JSON.stringify(message));
+	this.send = function (data) {
+		socket.send(JSON.stringify(data));
 	};
 
 	// PRIVATE
 	var that = this,
 		wsIP = arguments[0],
-		wsPort = arguments[1],
-		webSocket;
+		wsPort = arguments[1];
+	var socket;
+	var reconnectTimeout,
+		reconnectTime = 2000,
+		reconnectCount = 0;
+
+	var connect = function () {
+		//console.log('WebSocket Connect');
+		$('#connection').text('Connecting ...');
+
+		socket = new WebSocket('ws://' + wsIP + ':' + wsPort);
+
+		setEvents();
+	};
+
+	var setEvents = function () {
+		socket.onopen = function () {
+			reconnectCount = 0;
+			//console.log('WebSocket Open: (STATUS: ' + socket.readyState + ')');
+			//$('#connection').text('Connected');
+
+			observer.onConnectionEstablished();
+			//onOpen();
+		};
+
+		socket.onmessage = function (message) {
+			//console.log('Received: %s', message.data);
+
+			var data = JSON.parse(message.data);
+			//console.log(data);
+
+			observer.onDataReceived(data);
+			//onMessage(data);
+		};
+
+		socket.onerror = function (error) {
+			//console.log('WebSocket Error: ' + error);
+		};
+
+		socket.onclose = function () {
+			//console.log('WebSocket Close');
+
+			observer.onConnectionClosed();
+			//onClose();
+			reConnect();
+		};
+	};
+
+	var reConnect = function () {
+		clearTimeout(reconnectTimeout);
+		reconnectCount++;
+
+		//console.log('WebSocket ReConnect ('+reconnectCount+')');
+		$('#connection').text('ReConnecting ('+reconnectCount+')...');
+
+		reconnectTimeout = setTimeout(function () {
+			connect();
+		}, reconnectTime);
+	};
 
 	var init = function () {
-		webSocket = new WebSocket('ws://' + wsIP + ':' + wsPort);
-
-		webSocket.onopen = function () {
-			console.log('WebSocket open: (' + webSocket.readyState + ')');
-
-			var message = {
-				type: 'setClientType',
-				clientType: 'observer'
-			};
-			that.send(message);
-		};
-
-		webSocket.onmessage = function (message) {
-			console.log('WebSocket recieved: ' + message.data);
-			var data = JSON.parse(message.data);
-
-			var newPlayer = new Player(1, data.name, parseInt(data.deg));
-			observer.players[newPlayer.id] = newPlayer;
-		};
-
-		webSocket.onclose = function () {
-			console.log('WebSocket close');
-		};
-
-		webSocket.onerror = function (error) {
-			console.log('WebSocket error: ' + error);
-		};
+		//$('#connection').text('Connecting ...');
+		connect();
 	};
 
 	// INIT
@@ -223,214 +127,369 @@ function WebSocketServer () {
 }
 
 
-function getRadiant (degrees) {
-	return degrees * Math.PI / 180;
-}
 
 
 
-/*
 
-//var length = players.length;
-//for (var i = 0, length; i < length; i++) {
-//	drawPlayer(players[i].deg, 'rgba(0,176,111,0.7)');
-//}
 
-this.pause = function () {
-cancelAnimationFrame(animationFrameId);
-}
 
 
 
-function GameJS () {
 
-// PRIVATE
-var that = this;
 
-var canvasId = arguments[0],
-canvas, context,
-animationFrameId;
 
-var players = [99];
 
-var dot = {
-xPos: 100,
-yPos: 100,
-deg: 45,
-speed: 1,
-size: 10
-}
 
-var init = function () {
-canvas = document.getElementById(canvasId);
-context = canvas.getContext('2d');
 
-//setEventListener();
-onWindowResize();
 
 
 
-var setEventListener = function () {
-window.addEventListener('resize', onWindowResize);
-};
-
-var onWindowResize = function () {
-canvas.height = window.innerHeight;
-canvas.width = window.innerWidth;
-draw();
-};
-
-
-
-var draw = function () {
-clear();
-
-drawDot();
-
-
-
-
-context.beginPath();
-context.arc(100,75,50,0,0.5*Math.PI, false);
-context.lineWidth = 15;
-context.strokeStyle = 'rgba(255, 0, 0, 0.5)';
-context.stroke();
-
-
-context.beginPath();
-context.arc(100,75,50,1.2*Math.PI,1.7*Math.PI, false);
-context.lineWidth = 15;
-context.strokeStyle = 'rgba(0, 0, 255, 0.5)';
-context.stroke();
-
-}
-
-
-var drawDot = function () {
-
-
-context.beginPath();
-context.arc(dot.xPos, dot.yPos, dot.size, 0, 2 * Math.PI, false);
-context.fillStyle = 'rgba(255, 0, 0, 0.5)';
-context.fill();
-}
-
-
-
-
-var updateTeams = function () {
-//var team1List = document.getElementById('team-red');
-//var team2List = document.getElementById('team-blue');
-
-
-var listHtml = '';
-
-
-
-
-
-/*
-players.forEach(function (player, index) {
-console.log(player);
-
-listHtml += '<li>' + player.name + '</li>';
-});
-
-team1List.innerHTML = listHtml;
-}
-
-
-
-};
-
-
-var game = new GameJS('canvas');
-
-
-
-var p1 = new Player();
-p1.name = 'P 1';
-p1.team = 'red';
-p1.deg = 12;
-
-var p2 = new Player();
-p2.name = 'P 2';
-p2.team = 'blue';
-p2.deg = 36;
-
-game.addPlayer(p1);
-game.addPlayer(p2);
-
-
-
-/*
-
-
-
-
-
-
-
-document.addEventListener('DOMContentLoaded', function () {
-//var observerCanvas = new ObserverJS('canvas');
-//var observerCanvas.draw();
-});
-
-function ObserverJS () {
-// PUBLIC
-this.config = {};
-
-this.addClip = function (clip) {
-clips.push(clip);
-};
-
-// PRIVATE
-var canvasId = arguments[0],
-canvas, context,
-animationFrameId;
-var that = this;
-var clips = [];
-
-var init = function () {
-//log('canvas: init ['+canvasId+']');
-
-canvas = document.getElementById(canvasId);
-context = canvas.getContext('2d');
-
-//setEventListener();
-//onWindowResize();
-
-clear()
-};
-
-
-var setEventListener = function () {
-window.addEventListener('resize', onWindowResize);
-//canvas.addEventListener('click', onClick);
-};
-
-/.*
-var onWindowResize = function () {
-log('game: resize');
-clear();
-canvas.height = window.innerHeight;
-canvas.width = window.innerWidth;
-//draw();
-};
-*./
-var draw = function () {
-log('game: draw');
-clear();
-
-//for (var clip in clips) {
-//	log(value);
-//}
-
-context.beginPath();
-context.arc(100,75,50,0,2*Math.PI);
-context.stroke();
-};
-
-}
-
-*/
+// 'use strict';
+//
+// var wsIP = '127.0.0.1';
+// var wsPort = 63555;
+//
+// var observer = new Observer(),
+// 	webSocket;
+//
+// //document.addEventListener('DOMContentLoaded', function () {
+// $(document).ready(function () {
+// 	observer.init({wsIP: wsIP, wsPort: wsPort});
+// });
+//
+// function Observer () {
+// 	// PUBLIC
+//
+// 	// PRIVATE
+// 	var teams = [];
+// 	var players = [];
+// 	var animationFrameId;
+//
+// 	// var canvas = $('#canvas').get(0);
+// 	// 	canvas.height = window.innerHeight;
+// 	// 	canvas.width = window.innerWidth;
+// 	// var context = canvas.getContext('2d');
+//
+//
+// 	/*var init = function () {
+// 		canvas = document.getElementById(canvasId);
+// 		context = canvas.getContext('2d');
+//
+// 		setEventListener();
+// 		onWindowResize();
+// 	};
+//
+// 	var clear = function () {
+// 		canvas.width = canvas.width;	// clears the canvas
+// 	};
+//
+// 	var draw = function () {
+// 		clear();
+// 		ball.draw();
+// 		drawPlayers();
+//
+// 		//animationFrameId = requestAnimationFrame(that.draw);
+//  	};
+//
+// 	var setEventListener = function () {
+// 		window.addEventListener('resize', onWindowResize);
+// 	};
+//
+// 	var onWindowResize = function () {
+// 		canvas.height = window.innerHeight;
+// 		canvas.width = window.innerWidth;
+// 		draw();
+// 	};
+// 	var draw = function () {
+//
+// 	};*/
+//
+// }
+//
+
+
+
+
+//
+// var allDefenseSizePercent = 50;
+// var teamDefenceSizePercent = allDefenseSizePercent / 2;
+//
+
+//
+
+//
+//
+// function ObserverJS () {
+//
+// 	// PUBLIC FUNCTIONS
+//
+//
+//
+//
+// 	// PRIVATE VARIABLES
+// 	var that = this,
+// 		ball,
+// 		animationFrameId;
+//
+// 	// PRIVATE FUNCTIONS
+
+//
+// 	var drawPlayers = function () {
+// 		that.players.forEach(function (player, index) {
+// 			var playerPosition = player.deg;
+//
+// 			var playerSize = 360 / (100 / teamDefenceSizePercent); // => 90°
+// 			var playerOffset = playerSize / 2;	// => 45°
+//
+// 			context.beginPath();
+// 			context.strokeStyle = player.color;
+// 			context.lineWidth = 40;
+// 			context.lineCap = 'round';
+// 			context.arc(canvas.width / 2, canvas.height / 2, 320, getRadiant(playerPosition - playerOffset), getRadiant(playerPosition + playerOffset));
+// 			context.stroke();
+//
+// 			context.beginPath();
+// 			context.strokeStyle = 'rgb(61,70,73)';
+// 			context.lineWidth = 10;
+// 			context.arc(canvas.width / 2, canvas.height / 2, 320, getRadiant(playerPosition-0.01), getRadiant(playerPosition+0.01));
+// 			context.stroke();
+// 		});
+// 	};
+// }
+//
+//
+// function Player (id, name, deg) {
+// 	this.id = id;
+// 	this.name = name;
+// 	this.deg = deg;
+// 	this.color = 'rgba(0,176,111,0.7)';
+// 	//this.team = 1;
+// 	//this.points = 5;
+//
+// 	this.draw = function (context) {
+//
+// 	};
+// }
+//
+//
+// function Ball () {
+//
+// 	// PUBLIC VARIABLES
+//
+// 	this.speed = 1;
+// 	this.colors = ['rgb(255,255,255)', 'rgb(0,176,111)', 'rgb(255,66,0)'];
+// 	this.color = this.colors[0];
+//
+// 	// PUBLIC FUNCTIONS
+// 	this.draw = function () {
+//
+//
+// 		context.beginPath();
+// 		context.fillStyle = this.color;
+// 		context.arc((canvas.width / 2) + this.x, (canvas.height / 2) + this.y, this.radius, 0, 2 * Math.PI);
+// 		context.fill();
+//
+// 		collisionTest(this.x, this.y);
+// 	};
+//
+// 	var that = this;
+//
+// 	var collisionTest = function (x, y) {
+// 		// draw circle on collision-test-point
+// 		//context.beginPath();
+// 		//context.fillStyle = 'rgb(255,0,0)';
+// 		//context.arc((canvas.width / 2) + x, (canvas.height / 2) + y, 3, 0, Math.PI * 2);
+// 		//context.fill();
+//
+//
+// 		var distanceFromCenter = Math.round(Math.sqrt((that.x * that.x) + (that.y * that.y)));
+// 		//console.log('distanceFromCenter: ' + distanceFromCenter);
+//
+// 		if (distanceFromCenter >= 280) {
+// 			//var testColor = context.getImageData(0, 0, 1, 1).data;
+// 			//var testColor = context.getImageData((canvas.width / 2) + x, (canvas.height / 2) + y, 1, 1).data;
+// 			//console.log(testColor);
+//
+//
+//
+// 			//hasLeft();
+// 			hasHitAPaddle();
+// 		}
+// 	};
+//
+// 	var hasLeft = function () {
+// 		that.x = 0;
+// 		that.y = 0;
+// 		that.speed = 1;
+// 		that.color = that.colors[0];
+//
+// 	};
+//
+// 	var hasHitAPaddle = function () {
+// 		that.speed += 1;
+// 		if (that.color == that.colors[2]) {
+// 			that.color = that.colors[1];
+// 		} else {
+// 			that.color = that.colors[2];
+// 		}
+//
+// 		that.deg = Math.random()*360;
+// 		//that.deg = Math.round(Math.random() * 30 + 180);
+//
+//
+// 		//Math.floor(Math.random() * 40) - 20;
+// 	}
+//
+// /.*
+// 	var imgData = context.getImageData(0, 0, canvas.width, canvas.height);
+// 	// invert colors
+// 	for (var i = 0; i < imgData.data.length; i += 4) {
+// 		imgData.data[i] = 255-imgData.data[i];
+// 		imgData.data[i+1] = 255-imgData.data[i+1];
+// 		imgData.data[i+2] = 255-imgData.data[i+2];
+// 		imgData.data[i+3] = 255;
+// 	}
+//  	context.putImageData(imgData,0,0);
+// *./
+//
+// }
+//
+//
+// function WebSocketServer () {
+// 	// PUBLIC
+// 	this.send = function (message) {
+// 		webSocket.send(JSON.stringify(message));
+// 	};
+//
+// 	// PRIVATE
+// 	var that = this,
+// 		wsIP = arguments[0],
+// 		wsPort = arguments[1],
+// 		webSocket;
+//
+//
+//	//var newPlayer = new Player(1, data.name, parseInt(data.deg));
+//
+// }
+//
+//
+//
+//
+// //var length = players.length;
+// //for (var i = 0, length; i < length; i++) {
+// //	drawPlayer(players[i].deg, 'rgba(0,176,111,0.7)');
+// //}
+//
+// this.pause = function () {
+// cancelAnimationFrame(animationFrameId);
+// }
+//
+//
+//
+// function GameJS () {
+//
+// var canvasId = arguments[0],
+// canvas, context,
+// animationFrameId;
+//
+//
+//
+//
+// var draw = function () {
+// clear();
+//
+// drawDot();
+//
+//
+// context.beginPath();
+// context.arc(100,75,50,0,0.5*Math.PI, false);
+// context.lineWidth = 15;
+// context.strokeStyle = 'rgba(255, 0, 0, 0.5)';
+// context.stroke();
+//
+//
+// context.beginPath();
+// context.arc(100,75,50,1.2*Math.PI,1.7*Math.PI, false);
+// context.lineWidth = 15;
+// context.strokeStyle = 'rgba(0, 0, 255, 0.5)';
+// context.stroke();
+//
+// }
+//
+//
+// var drawDot = function () {
+// context.beginPath();
+// context.arc(dot.xPos, dot.yPos, dot.size, 0, 2 * Math.PI, false);
+// context.fillStyle = 'rgba(255, 0, 0, 0.5)';
+// context.fill();
+// }
+//
+//
+//
+//
+//
+// /*
+// players.forEach(function (player, index) {
+// console.log(player);
+//
+// listHtml += '<li>' + player.name + '</li>';
+// });
+//
+// team1List.innerHTML = listHtml;
+// }
+//
+//
+//
+// };
+//
+//
+//
+// document.addEventListener('DOMContentLoaded', function () {
+// //var observerCanvas = new ObserverJS('canvas');
+// //var observerCanvas.draw();
+// });
+//
+// function ObserverJS () {
+// // PUBLIC
+// this.config = {};
+//
+// this.addClip = function (clip) {
+// clips.push(clip);
+// };
+//
+// // PRIVATE
+// var canvasId = arguments[0],
+// canvas, context,
+// animationFrameId;
+// var that = this;
+// var clips = [];
+//
+//
+//
+// var setEventListener = function () {
+// window.addEventListener('resize', onWindowResize);
+// };
+//
+// /.*
+// var onWindowResize = function () {
+// log('game: resize');
+// clear();
+// canvas.height = window.innerHeight;
+// canvas.width = window.innerWidth;
+// //draw();
+// };
+// *./
+// var draw = function () {
+// log('game: draw');
+// clear();
+//
+//
+//
+// context.beginPath();
+// context.arc(100,75,50,0,2*Math.PI);
+// context.stroke();
+// };
+//
+// }
+//
+// */

@@ -1,39 +1,34 @@
 html {
-	background: rgb(61,70,73);
+	height: 100%;
+	background: rgb(0,0,0);
 }
 
 body {
 	margin: 0;
+	height: 100%;
 	font-family: sans-serif;
+	background: rgb(61,70,73);
+	overflow: hidden;
+	-webkit-text-size-adjust: 100%;
+
 }
 
-#canvas {
+#connection {
 	display: block;
 	height: 100%;
-	width: 100%;
+	line-height: 100vh;
+	color: #eee;
+	font-size: 10vw;
+	text-align: center;
 }
 
-/*
-.team {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	z-index: 20;
-	padding: 1em 2em;
-	background: #444;
+#display {
+	display: none;
+	height: 100%;
 }
 
-#team-blue {
-	left: 0;
-	color: #00f;
-}
-
-#team-red {
-	color: #f00;
-	right: 0;
-}
-
-.team li {
-	padding: 0.2em;
-}
-*/
+	#display-canvas {
+		display: block;
+		height: 100%;
+		width: 100%;
+	}
