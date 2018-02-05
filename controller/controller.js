@@ -1,6 +1,7 @@
 'use strict';
 
 var wsIP = '127.0.0.1';
+//var wsIP = '192.168.0.15';
 var wsPort = 63555;
 
 var controller = new Controller(),

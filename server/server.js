@@ -2,6 +2,8 @@
 
 var wsPort = 63555;
 var wsTitle = 'SocketServer';
+var allDefenseSizePercent = 50;
+var teamDefenceSizePercent = allDefenseSizePercent / 2;
 
 var clients = {};
 var teams = {
@@ -32,12 +34,12 @@ wss.on('connection', function (ws, req) {
 	console.log('New client connected (id: ' + id + ')');
 
 	clients[id] = {
-		ws: ws,
+		//ws: ws,
 		type: false
 	};
 
 	ws.on('message', function (message) {
-		console.log('Received: %s', message);
+		//console.log('Received: %s', message);
 
 		var data = JSON.parse(message);
 
@@ -59,6 +61,8 @@ wss.on('connection', function (ws, req) {
 							teams[2][id] = players[id];
 						}
 
+						console.log('Teams are (' + Object.keys(teams[1]).length + '|' + Object.keys(teams[2]).length+')');
+
 						ws.send(JSON.stringify({
 							type: 'setTeam',
 							team: players[id].team
@@ -76,13 +80,14 @@ wss.on('connection', function (ws, req) {
 			break;
 
 			case 'setDeg':
-				players[id].deg = data.deg;
+				players[id].deg = parseInt(data.deg);
 
+				/*
 				for (var key in observers) {
 					var observer = observers[key];
 					var player = players[id];
 					//var playerWs = player.ws;
-					delete player.ws;
+					//delete player.ws;
 
 					observer.ws.send(JSON.stringify({
 						type: 'updatePlayer',
@@ -91,12 +96,14 @@ wss.on('connection', function (ws, req) {
 
 					//player.ws = playerWs;
 				}
+				*/
 			break;
 
-			case 'getBalls':
-				observers[id].ws.send(JSON.stringify({
-					type: 'setBalls',
-					balls: balls
+			case 'getGameState':
+				ws.send(JSON.stringify({
+					type: 'setGameState',
+					balls: balls,
+					players: players
 				}));
 			break;
 
@@ -114,32 +121,103 @@ wss.on('connection', function (ws, req) {
 		}
 
 		delete clients[id];	// remove from clients
+
+		if (Object.keys(players).length === 0) {
+			clearInterval(tickInterval);
+		}
 	});
 });
 
-var tickCount = 0;
+var tickInterval;
 function tick () {
-	tickCount++;
-	console.log(tickCount);
+	balls.forEach(function(ball) {
+		ball.tick();
+	});
 }
-//setInterval(tick, 1000);
+tickInterval = setInterval(tick, 50);
 
-function Ball () {} {
+function Ball () {
 	this.x = 0;
 	this.y = 0;
 	this.deg = Math.random() * 360;
 	this.speed = 1;
-	this.lastCollision = false;
+	this.lastCollision = null;
 
 	this.tick = function () {
 		this.x += Math.cos(getRadiant(this.deg)) * this.speed;
-		this.y += Math.sin(getRadiant(this.deg)) * this.speed;
+	 	this.y += Math.sin(getRadiant(this.deg)) * this.speed;
+
+		checkCollision();
 	};
+	
+	var that = this;
+	var checkCollision = function () {
+		var a2 = Math.pow(that.x, 2);
+		var b2 = Math.pow(that.y, 2);
+		var c2 = a2 + b2;
+		var r = Math.round(Math.abs(Math.sqrt(c2)));
+
+		//console.log(r);
+
+    	if (r > 100) {
+    		// check for collision with players
+			for (var key in players) {
+				var player = players[key];
+
+				if (player.deg !== undefined) {
+
+					var playerDefenceSizePercent = teamDefenceSizePercent / Object.keys(teams[player.team]).length;
+
+					var playerDefenceDeg = 360 / 100 * playerDefenceSizePercent;
+
+					var playerDefenceDegFrom = getDegrees(player.deg - (playerDefenceDeg / 2));
+					var playerDefenceDegTo = getDegrees(player.deg + (playerDefenceDeg / 2));
+
+
+					//console.log('that.deg ', that.deg);
+					//console.log('playerDefenceSizePercent ', playerDefenceSizePercent);
+					//console.log('playerDefenceDeg ', playerDefenceDeg);
+					//console.log('playerDefenceDegFrom ', playerDefenceDegFrom, ' playerDefenceDegTo ' + playerDefenceDegTo);
+
+
+					if (that.deg >= playerDefenceDegFrom && that.deg <= playerDefenceDegTo) {
+						console.log('HIT !!');
+					}
+					//player.deg
+
+
+					// hit this player?
+
+					// set lastastCollistion
+					//that.lastCollision = player.team;
+
+					// player hit -> bounce
+					//that.deg = Math.random() * 360;
+
+					// increase speed
+				}
+			}
+
+			// no player hit
+			// ball is off playground
+			that.x = 0;
+			that.y = 0;
+			that.speed = 1;
+			that.deg = Math.random() * 360;
+    	}
+
+	}
 
 }
 
 function getRadiant (degrees) {
 	return degrees * Math.PI / 180;
+}
+
+function getDegrees (degrees) {
+	if (degrees < 0) return degrees + 360;
+	if (degrees > 360) return degrees + 360;
+	return degrees;
 }
 
 //process.exit(0);
