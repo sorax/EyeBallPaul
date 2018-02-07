@@ -24,8 +24,9 @@ function Observer () {
 			// break;
 
 			case 'setGameState':
-				players = data.players;
 				balls = data.balls;
+				teams = data.teams;
+				players = data.players;
 			break;
 		}
 
@@ -55,8 +56,9 @@ function Observer () {
 	};
 
 	// PRIVATE
-	var players = {};
 	var balls = [];
+	var teams = {};
+	var players = {};
 	var canvas = document.getElementById('display-canvas');
 		canvas.height = window.innerHeight;
 		canvas.width = window.innerWidth;
@@ -94,7 +96,7 @@ function Observer () {
 			//context.strokeStyle = rgb(255,66,0);
 			context.lineWidth = 40;
 			context.lineCap = 'round';
-			context.arc(canvas.width / 2, canvas.height / 2, 140, getRadiant(player.deg-10), getRadiant(player.deg+10));
+			context.arc(canvas.width / 2, canvas.height / 2, 140, getRadiant(player.deg - 10), getRadiant(player.deg + 10));
 			context.stroke();
 
 		}

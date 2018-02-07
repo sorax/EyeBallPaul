@@ -103,6 +103,7 @@ wss.on('connection', function (ws, req) {
 				ws.send(JSON.stringify({
 					type: 'setGameState',
 					balls: balls,
+					teams: teams,
 					players: players
 				}));
 			break;
@@ -149,7 +150,7 @@ function Ball () {
 
 		checkCollision();
 	};
-	
+
 	var that = this;
 	var checkCollision = function () {
 		var a2 = Math.pow(that.x, 2);
@@ -160,12 +161,24 @@ function Ball () {
 		//console.log(r);
 
     	if (r > 100) {
+			that.x = Math.cos(that.deg) * 100;
+			that.y = Math.sin(that.deg) * 100;
+
+			a2 = Math.pow(that.x, 2);
+			b2 = Math.pow(that.y, 2);
+			c2 = a2 + b2;
+			r = Math.round(Math.abs(Math.sqrt(c2)));
+
+			//console.log('r = ', r);
+
+
     		// check for collision with players
+			var wasHit = false;
+
 			for (var key in players) {
 				var player = players[key];
 
 				if (player.deg !== undefined) {
-
 					var playerDefenceSizePercent = teamDefenceSizePercent / Object.keys(teams[player.team]).length;
 
 					var playerDefenceDeg = 360 / 100 * playerDefenceSizePercent;
@@ -180,34 +193,35 @@ function Ball () {
 					//console.log('playerDefenceDegFrom ', playerDefenceDegFrom, ' playerDefenceDegTo ' + playerDefenceDegTo);
 
 
-					if (that.deg >= playerDefenceDegFrom && that.deg <= playerDefenceDegTo) {
-						console.log('HIT !!');
-					}
-					//player.deg
-
-
 					// hit this player?
+					if (that.deg >= playerDefenceDegFrom && that.deg <= playerDefenceDegTo) {
+						//console.log('HIT !!');
+						wasHit = true;
 
-					// set lastastCollistion
-					//that.lastCollision = player.team;
+						// set lastastCollistion
+						that.lastCollision = player.team;
 
-					// player hit -> bounce
-					//that.deg = Math.random() * 360;
+						// player hit -> bounce
+						console.log(that.deg);
+						that.deg = getDegrees(180 - that.deg);
+						console.log(that.deg);
 
-					// increase speed
+						// increase speed
+						that.speed = that.speed + 1;
+					}
 				}
 			}
 
-			// no player hit
-			// ball is off playground
-			that.x = 0;
-			that.y = 0;
-			that.speed = 1;
-			that.deg = Math.random() * 360;
+			if (wasHit == false) {
+				// no player hit
+				// ball is off playground
+				that.x = 0;
+				that.y = 0;
+				that.speed = 1;
+				that.deg = Math.random() * 360;
+			}
     	}
-
 	}
-
 }
 
 function getRadiant (degrees) {
