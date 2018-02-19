@@ -1,7 +1,7 @@
 'use strict';
 
-var wsIP = '127.0.0.1';
-//var wsIP = '192.168.0.15';
+//var wsIP = '127.0.0.1';
+var wsIP = '192.168.0.14';
 var wsPort = 63555;
 
 var observer = new Observer(),
@@ -67,45 +67,48 @@ function Observer () {
 	var draw = function () {
 		clear();
 
+		var playgroundRadius = 0;
+		if (canvas.width > canvas.height) {
+			playgroundRadius = canvas.height / 2;
+		} else {
+			playgroundRadius = canvas.width / 2;
+		}
+		playgroundRadius -= 50;
+
+		var ballSize = 20;
+
+		// draw outer circle
 		context.beginPath();
 		context.strokeStyle = 'rgb(255,0,0)';
 		context.lineWidth = 10;
-		context.arc(canvas.width / 2, canvas.height / 2, 100 + 25, getRadiant(0), getRadiant(360));
+		context.arc(0, 0, playgroundRadius + (ballSize / 2), getRadiant(0), getRadiant(360));
 		context.stroke();
 
-
-
-		var radius = 20;
-
+		// draw balls
 		balls.forEach(function (ball, index) {
 			context.beginPath();
 			context.fillStyle = 'rgb(255,0,0)';//this.color;
-			context.arc((canvas.width / 2) + ball.x, (canvas.height / 2) + ball.y, radius, 0, 2 * Math.PI);
+			context.arc(ball.x * playgroundRadius / 100, ball.y * playgroundRadius / 100, ballSize, 0, 2 * Math.PI);
 			context.fill();
 		});
 
-
-
+		// draw players
 		for (var key in players) {
 			var player = players[key];
-
-			//var playerPosition =
 
 			context.beginPath();
 			context.strokeStyle = 'rgb(0,176,111)';
 			//context.strokeStyle = rgb(255,66,0);
 			context.lineWidth = 40;
 			context.lineCap = 'round';
-			context.arc(canvas.width / 2, canvas.height / 2, 140, getRadiant(player.deg - 10), getRadiant(player.deg + 10));
+			context.arc(0, 0, playgroundRadius + (ballSize), getRadiant(player.deg - 10), getRadiant(player.deg + 10));
 			context.stroke();
-
 		}
-
-
 	};
 
 	var clear = function () {
 		canvas.width = canvas.width;	// clears the canvas
+		context.translate(canvas.width / 2, canvas.height / 2);
 	};
 
 	var getGameState = function () {
@@ -113,7 +116,6 @@ function Observer () {
 			type: 'getGameState'
 		});
 	};
-
 }
 
 function WebSocketClient () {
