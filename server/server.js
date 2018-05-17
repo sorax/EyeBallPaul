@@ -148,7 +148,7 @@ tickInterval = setInterval(tick, 50);
 function Ball () {
 	this.x = 0;
 	this.y = 0;
-	this.deg = Math.random() * 360;
+	this.deg = 0;//Math.random() * 360;
 	this.speed = 1;
 	this.lastCollision = null;
 
@@ -168,14 +168,14 @@ function Ball () {
 
 		//console.log(r);
 
-    	if (r > 100) {
-			that.x = Math.cos(that.deg) * 100;
-			that.y = Math.sin(that.deg) * 100;
+    	if (r >= 100) {
+			// that.x = Math.cos(that.deg) * 100;
+			// that.y = Math.sin(that.deg) * 100;
 
-			a2 = Math.pow(that.x, 2);
-			b2 = Math.pow(that.y, 2);
-			c2 = a2 + b2;
-			r = Math.round(Math.abs(Math.sqrt(c2)));
+			// a2 = Math.pow(that.x, 2);
+			// b2 = Math.pow(that.y, 2);
+			// c2 = a2 + b2;
+			// r = Math.round(Math.abs(Math.sqrt(c2)));
 
 			//console.log('r = ', r);
 
@@ -191,14 +191,14 @@ function Ball () {
 
 					var playerDefenceDeg = 360 / 100 * playerDefenceSizePercent;
 
-					var playerDefenceDegFrom = getDegrees(player.deg - (playerDefenceDeg / 2));
-					var playerDefenceDegTo = getDegrees(player.deg + (playerDefenceDeg / 2));
+					var playerDefenceDegFrom = player.deg - (playerDefenceDeg / 2);
+					var playerDefenceDegTo = player.deg + (playerDefenceDeg / 2);
 
 
-					//console.log('that.deg ', that.deg);
-					//console.log('playerDefenceSizePercent ', playerDefenceSizePercent);
-					//console.log('playerDefenceDeg ', playerDefenceDeg);
-					//console.log('playerDefenceDegFrom ', playerDefenceDegFrom, ' playerDefenceDegTo ' + playerDefenceDegTo);
+					console.log('player.deg ', player.deg);
+					console.log('playerDefenceSizePercent ', playerDefenceSizePercent);
+					console.log('playerDefenceDeg ', playerDefenceDeg);
+					console.log('playerDefenceDegFrom ', playerDefenceDegFrom, ' playerDefenceDegTo ' + playerDefenceDegTo);
 
 
 					// hit this player?
@@ -211,7 +211,9 @@ function Ball () {
 
 						// player hit -> bounce
 						console.log(that.deg);
-						that.deg = getDegrees(180 - that.deg);
+
+						var reflection = 180 + that.deg - player.deg;
+						that.deg = getDegrees(reflection - that.deg);
 						console.log(that.deg);
 
 						// increase speed
@@ -226,7 +228,7 @@ function Ball () {
 				that.x = 0;
 				that.y = 0;
 				that.speed = 1;
-				that.deg = Math.random() * 360;
+				that.deg = 0;//Math.random() * 360;
 			}
     	}
 	}
