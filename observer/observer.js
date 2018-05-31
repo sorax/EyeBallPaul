@@ -100,8 +100,14 @@ function Observer () {
 			context.strokeStyle = 'rgb(0,176,111)';
 			//context.strokeStyle = rgb(255,66,0);
 			context.lineWidth = 40;
-			context.lineCap = 'round';
-			context.arc(0, 0, playgroundRadius + (ballSize), getRadiant(player.deg - 10), getRadiant(player.deg + 10));
+			//context.lineCap = 'round';
+			//context.arc(0, 0, playgroundRadius + (ballSize), getRadiant(player.deg - player.defenceSize / 2), getRadiant(player.deg + player.defenceSize / 2));
+			var playerStartDeg = getDegrees(player.deg - player.defenceSize / 100 * 180)
+			var playerEndDeg = getDegrees(player.deg + player.defenceSize / 100 * 180)
+			context.arc(0, 0, playgroundRadius + (ballSize), getRadiant(playerStartDeg), getRadiant(playerEndDeg));
+			console.log('playerStartDeg', playerStartDeg)
+			console.log('playerEndDeg', playerEndDeg)
+			console.log('defenceSize', player.defenceSize)
 			context.stroke();
 		}
 	};
@@ -200,8 +206,11 @@ function getRadiant (degrees) {
 	return degrees * Math.PI / 180;
 }
 
-
-
+function getDegrees(degrees) {
+	if (degrees < 0) return degrees + 360;
+	if (degrees >= 360) return degrees - 360;
+	return degrees;
+}
 
 
 

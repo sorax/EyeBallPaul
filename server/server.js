@@ -54,6 +54,7 @@ wss.on('connection', function (ws, req) {
 						players[id].points = 0;
 						players[id].name = '';
 						players[id].deg = 0;
+						
 
 						if (Object.keys(teams[1]).length <= Object.keys(teams[2]).length) {
 							players[id].team = 1;
@@ -78,13 +79,14 @@ wss.on('connection', function (ws, req) {
 				break;
 
 			case 'setName':
+				console.log('set player name');
+				console.log('name:', data.name);
 				var name = data.name.toString();
-				console.log(1);
-				var pattern = /(\w|\d){8}/g;
-				if (pattern.test(name)) {
-					console.log(2);
+				//var pattern = /(\w|\d){8}/g;
+				//if (pattern.test(name)) {
 					players[id].name = name;
-				}
+					players[id].defenceSize = teamDefenceSizePercent / Object.keys(teams[players[id].team]).length
+				//}
 				break;
 
 			case 'setDeg':
