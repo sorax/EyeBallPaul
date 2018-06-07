@@ -10,7 +10,19 @@ var teams = {
 	1: {},
 	2: {}
 };
-var players = {};
+var players = {
+	//players[id] = clients[id];
+	'test1': {
+		points: 0,
+		name: 'Test 1',
+		deg: 315,
+		team: 1,
+		defenceSize: 25
+	}
+};
+teams[1]['test1'] = players['test1'];
+
+
 var observers = {};
 var balls = [new Ball()];
 
@@ -150,13 +162,15 @@ tickInterval = setInterval(tick, 50);
 function Ball() {
 	this.x = 0;
 	this.y = 0;
+	this.startX = 0;
+	this.startY = 0;
 	this.deg = 0;//Math.random() * 360;
 	this.speed = 1;
 	this.lastCollision = null;
 
 	this.tick = function () {
-		this.x += Math.cos(getRadiant(this.deg)) * this.speed;
-		this.y += Math.sin(getRadiant(this.deg)) * this.speed;
+		this.x += Math.cos(getRadiant(this.deg)) * this.speed + this.startX;
+		this.y += Math.sin(getRadiant(this.deg)) * this.speed + this.startY;
 
 		checkCollision();
 	};
@@ -198,11 +212,7 @@ function Ball() {
 
 
 
-					console.log('player.deg ', player.deg);
-					console.log('playerDefenceSizePercent ', playerDefenceSizePercent);
-					console.log('playerDefenceDeg ', playerDefenceDeg);
-					console.log('playerDefenceDegFrom ', playerDefenceDegFrom, ' playerDefenceDegTo ' + playerDefenceDegTo);
-
+					
 					// 0 - 40      10
 					if (playerDefenceDegFrom < playerDefenceDegTo) {
 						if (that.deg >= playerDefenceDegFrom && that.deg <= playerDefenceDegTo) {
@@ -223,14 +233,23 @@ function Ball() {
 						that.lastCollision = player.team;
 
 						// player hit -> bounce
-						console.log(that.deg);
+						console.log('[deg] Ball', that.deg);
+						console.log('[deg] Player', player.deg);
+
 
 						var reflection = 180 + that.deg - player.deg;
 						that.deg = getDegrees(reflection - that.deg);
 						console.log(that.deg);
 
+						//clearInterval(tickInterval);
+
+						that.startX = that.x;
+						that.startY = that.y;
+
 						// increase speed
 						that.speed = that.speed + 1;
+
+						
 
 						//process.exit(0);
 					}
@@ -240,10 +259,27 @@ function Ball() {
 			if (wasHit == false) {
 				// no player hit
 				// ball is off playground
-				that.x = 0;
-				that.y = 0;
-				that.speed = 1;
-				that.deg = 0;//Math.random() * 360;
+
+
+				clearInterval(tickInterval);
+				console.log('ball.deg ', that.deg);
+				console.log('player.deg ', player.deg);
+				console.log('playerDefenceSizePercent ', playerDefenceSizePercent);
+				console.log('playerDefenceDeg ', playerDefenceDeg);
+				console.log('playerDefenceDegFrom ', playerDefenceDegFrom, ' playerDefenceDegTo ' + playerDefenceDegTo);
+
+
+
+				// that.x = 0;
+				// that.y = 0;
+				// that.startX = 0;
+				// that.startY = 0;
+				// that.speed = 1;
+				// that.deg = 0;//Math.random() * 360;
+
+				
+
+
 			}
 		}
 	}
