@@ -12,15 +12,15 @@ var teams = {
 };
 var players = {
 	//players[id] = clients[id];
-	'test1': {
-		points: 0,
-		name: 'Test 1',
-		deg: 315,
-		team: 1,
-		defenceSize: 25
-	}
+	// 'test1': {
+	// 	points: 0,
+	// 	name: 'Test 1',
+	// 	deg: 315,
+	// 	team: 1,
+	// 	defenceSize: 25
+	// }
 };
-teams[1]['test1'] = players['test1'];
+// teams[1]['test1'] = players['test1'];
 
 
 var observers = {};
@@ -102,7 +102,7 @@ wss.on('connection', function (ws, req) {
 				break;
 
 			case 'setDeg':
-				players[id].deg = getDegrees(parseInt(data.deg));
+				players[id].deg = fixDegrees(parseInt(data.deg));
 
 				/*
 				for (var key in observers) {
@@ -162,15 +162,13 @@ tickInterval = setInterval(tick, 50);
 function Ball() {
 	this.x = 0;
 	this.y = 0;
-	this.startX = 0;
-	this.startY = 0;
 	this.deg = 0;//Math.random() * 360;
 	this.speed = 1;
 	this.lastCollision = null;
 
 	this.tick = function () {
-		this.x += Math.cos(getRadiant(this.deg)) * this.speed + this.startX;
-		this.y += Math.sin(getRadiant(this.deg)) * this.speed + this.startY;
+		this.x += Math.cos(getRadiant(this.deg)) * this.speed;
+		this.y += Math.sin(getRadiant(this.deg)) * this.speed;
 
 		checkCollision();
 	};
@@ -207,21 +205,26 @@ function Ball() {
 
 					var playerDefenceDeg = 360 / 100 * playerDefenceSizePercent;
 
-					var playerDefenceDegFrom = getDegrees(player.deg - (playerDefenceDeg / 2));
-					var playerDefenceDegTo = getDegrees(player.deg + (playerDefenceDeg / 2));
+					var playerDefenceDegFrom = fixDegrees(player.deg - (playerDefenceDeg / 2));
+					var playerDefenceDegTo = fixDegrees(player.deg + (playerDefenceDeg / 2));
 
+					var gegenkathete = that.y;
+					var hypotenuse = 100;
+					var ballRelSin = Math.round(gegenkathete / hypotenuse * 100) / 100;
+					var ballRelDeg = Math.round(getDegrees(Math.asin(ballRelSin)));
 
-
+					console.log(ballRelSin);
+					console.log(ballRelDeg);
 					
 					// 0 - 40      10
 					if (playerDefenceDegFrom < playerDefenceDegTo) {
-						if (that.deg >= playerDefenceDegFrom && that.deg <= playerDefenceDegTo) {
+						if (that.deg >= playerDefenceDegFrom && ballRelDeg <= playerDefenceDegTo) {
 							wasHit = true;
 						}
 					}
 					// 340 - 20     10
 					if (playerDefenceDegFrom > playerDefenceDegTo) {
-						if (that.deg > playerDefenceDegTo && that.deg < playerDefenceDegFrom) {
+						if (that.deg > playerDefenceDegTo && ballRelDeg < playerDefenceDegFrom) {
 							wasHit = false;
 						} else {
 							wasHit = true;
@@ -238,13 +241,10 @@ function Ball() {
 
 
 						var reflection = 180 + that.deg - player.deg;
-						that.deg = getDegrees(reflection - that.deg);
+						that.deg = fixDegrees(reflection - that.deg);
 						console.log(that.deg);
 
 						//clearInterval(tickInterval);
-
-						that.startX = that.x;
-						that.startY = that.y;
 
 						// increase speed
 						that.speed = that.speed + 1;
@@ -261,24 +261,18 @@ function Ball() {
 				// ball is off playground
 
 
-				clearInterval(tickInterval);
-				console.log('ball.deg ', that.deg);
-				console.log('player.deg ', player.deg);
-				console.log('playerDefenceSizePercent ', playerDefenceSizePercent);
-				console.log('playerDefenceDeg ', playerDefenceDeg);
-				console.log('playerDefenceDegFrom ', playerDefenceDegFrom, ' playerDefenceDegTo ' + playerDefenceDegTo);
+				// clearInterval(tickInterval);
+				// console.log('ball.deg ', that.deg);
+				// console.log('player.deg ', player.deg);
+				// console.log('playerDefenceSizePercent ', playerDefenceSizePercent);
+				// console.log('playerDefenceDeg ', playerDefenceDeg);
+				// console.log('playerDefenceDegFrom ', playerDefenceDegFrom, ' playerDefenceDegTo ' + playerDefenceDegTo);
 
 
-
-				// that.x = 0;
-				// that.y = 0;
-				// that.startX = 0;
-				// that.startY = 0;
-				// that.speed = 1;
-				// that.deg = 0;//Math.random() * 360;
-
-				
-
+				that.x = 0;
+				that.y = 0;
+				that.speed = 1;
+				that.deg = 0;//Math.random() * 360;
 
 			}
 		}
@@ -289,7 +283,11 @@ function getRadiant(degrees) {
 	return degrees * Math.PI / 180;
 }
 
-function getDegrees(degrees) {
+function getDegrees(radiant) {
+	return radiant * (180 / Math.PI);
+}
+
+function fixDegrees(degrees) {
 	if (degrees < 0) return degrees + 360;
 	if (degrees >= 360) return degrees - 360;
 	return degrees;
