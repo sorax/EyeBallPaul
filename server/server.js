@@ -2,7 +2,7 @@
 
 var wsPort = 63555;
 var wsTitle = 'SocketServer';
-var allDefenseSizePercent = 50;
+var allDefenseSizePercent = 20;
 var teamDefenceSizePercent = allDefenseSizePercent / 2;
 
 var clients = {};
@@ -202,29 +202,46 @@ function Ball() {
 
 				if (player.deg !== undefined) {
 					var playerDefenceSizePercent = teamDefenceSizePercent / Object.keys(teams[player.team]).length;
-
 					var playerDefenceDeg = 360 / 100 * playerDefenceSizePercent;
-
 					var playerDefenceDegFrom = fixDegrees(player.deg - (playerDefenceDeg / 2));
 					var playerDefenceDegTo = fixDegrees(player.deg + (playerDefenceDeg / 2));
 
-					var gegenkathete = that.y;
-					var hypotenuse = 100;
-					var ballRelSin = Math.round(gegenkathete / hypotenuse * 100) / 100;
-					var ballRelDeg = Math.round(getDegrees(Math.asin(ballRelSin)));
 
-					console.log(ballRelSin);
-					console.log(ballRelDeg);
+					var sinusDesWinkelsDesBallsVomMittelpunktAus = Math.round(that.y / 100 * 100) / 100;
+					//console.log(sinusDesWinkelsDesBallsVomMittelpunktAus);
+				
+					var winkelsDesBallsVomMittelpunktAus = getDegrees(Math.asin(sinusDesWinkelsDesBallsVomMittelpunktAus));
+					if (that.y < 0) {
+						winkelsDesBallsVomMittelpunktAus += 180;
+					}
+					//console.log(winkelsDesBallsVomMittelpunktAus)
+		
+/*
+					+
+				   /|	
+				  / |
+				 /  |
+				+----
+*/
+					
+
+					// var gegenkathete = that.y;
+					// var hypotenuse = 100;
+					// var ballRelSin = Math.round(gegenkathete / hypotenuse * 100) / 100;
+					// var ballRelDeg = Math.round(getDegrees(Math.asin(ballRelSin)));
+
+					//console.log('ballRelSin', ballRelSin);
+					//console.log('ballRelDeg', ballRelDeg);
 					
 					// 0 - 40      10
 					if (playerDefenceDegFrom < playerDefenceDegTo) {
-						if (that.deg >= playerDefenceDegFrom && ballRelDeg <= playerDefenceDegTo) {
+						if (that.deg >= playerDefenceDegFrom && winkelsDesBallsVomMittelpunktAus <= playerDefenceDegTo) {
 							wasHit = true;
 						}
 					}
 					// 340 - 20     10
 					if (playerDefenceDegFrom > playerDefenceDegTo) {
-						if (that.deg > playerDefenceDegTo && ballRelDeg < playerDefenceDegFrom) {
+						if (that.deg > playerDefenceDegTo && winkelsDesBallsVomMittelpunktAus < playerDefenceDegFrom) {
 							wasHit = false;
 						} else {
 							wasHit = true;
@@ -236,13 +253,13 @@ function Ball() {
 						that.lastCollision = player.team;
 
 						// player hit -> bounce
-						console.log('[deg] Ball', that.deg);
-						console.log('[deg] Player', player.deg);
+						//console.log('[deg] Ball', that.deg);
+						//console.log('[deg] Player', player.deg);
 
 
 						var reflection = 180 + that.deg - player.deg;
 						that.deg = fixDegrees(reflection - that.deg);
-						console.log(that.deg);
+						//console.log(that.deg);
 
 						//clearInterval(tickInterval);
 
@@ -280,7 +297,7 @@ function Ball() {
 }
 
 function getRadiant(degrees) {
-	return degrees * Math.PI / 180;
+	return degrees * (Math.PI / 180);
 }
 
 function getDegrees(radiant) {

@@ -32,3 +32,10 @@ body {
 		height: 100%;
 		width: 100%;
 	}
+
+	#debug {
+		display: inline;
+		padding: 0.2em;
+		color: #eee;
+		background: #222;
+	}

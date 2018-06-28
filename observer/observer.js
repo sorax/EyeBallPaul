@@ -27,6 +27,29 @@ function Observer () {
 				balls = data.balls;
 				teams = data.teams;
 				players = data.players;
+
+				var playerDeg = 0;
+				var playerDefenceSize = 0;
+				for (var key in players) {
+					var player = players[key];
+					playerDeg = player.deg;
+					playerDefenceSize = player.defenceSize;
+				}
+
+				// $('#debug').html(
+				// 	'Ball: '+JSON.stringify(balls[0].deg)+'<br>'+
+				// 	'Player: '+playerDeg+'<br>'+
+				// 	'PlayerDefenceSize: '+playerDefenceSize+'<br>'+
+				// 	JSON.stringify(players)
+				// );
+
+
+				context.beginPath();
+				context.strokeStyle = 'rgb(255,255,255)';
+				context.lineWidth = 10;
+				context.arc(0, 0, 10, getRadiant(0), getRadiant(10));
+				context.stroke();
+
 			break;
 		}
 
