@@ -2,7 +2,8 @@ console.log('webServer.js')
 
 const http = require('http')
 const fs = require('fs')
-const port = process.env.npm_package_config_http_port
+const httpPort = process.env.npm_package_config_http_port
+const wsPort = process.env.npm_package_config_ws_port
 let ip = ''
 const publicFolder = 'http'
 const publicFiles = {
@@ -22,33 +23,53 @@ class WebServer {
             const ip = request.socket.address().address;
             const ip2 = request.connection.remoteAddress;
 
+
+            let responseData = ''
+            let responseType = ''
+
+            // 1 - config
+
+            // 1.) http://www.eyeballpaul.de/
+            // 2.) http://www.eyeballpaul.de/controller.html oder http://www.eyeballpaul.de/observer.html
+            // 3.) -> http://www.eyeballpaul.de/config.js
+            
+
+            if (request.url === '/config.js'){
+                responseData = `const = '${ip}:${wsPort}';`
+                responseType = contentTypes[js]
+            } else {
+                const fileType = url.split('.').slice(-1)
+                //console.log(fileType)
+    
+                const fileName = url.split('/')[1].split('.')[0]
+                //console.log('fileName', fileName + '.' + fileType);
+    
+                let filePath = publicFolder + '/404.html'
+                //console.error(publicFiles[fileType].indexOf(fileName))
+    
+                if (publicFiles[fileType].indexOf(fileName) !== -1) {
+                    filePath = publicFolder + '/' + fileName + '.' + fileType
+                    //console.log('A')
+                } else {
+                    //console.log('B')
+                }
+                //console.log('filePath', filePath);
+    
+            }
+
+            // 2 - datei die nicht existiert
+            // 3 - datei die existiert
+
+
+
+
             //console.log('---')
             const url = request.url !== '/' ? request.url : '/index.html'
             //console.log('url', url);
 
-            let responseData = ''
-            if (url === '/config.js') {
-                responseData = '{a:2}'
-                console.log('responseData', responseData)
-            }
+            
 
-            const fileType = url.split('.').slice(-1)
-            //console.log(fileType)
-
-            const fileName = url.split('/')[1].split('.')[0]
-            //console.log('fileName', fileName + '.' + fileType);
-
-            let filePath = publicFolder + '/404.html'
-            //console.error(publicFiles[fileType].indexOf(fileName))
-
-            if (publicFiles[fileType].indexOf(fileName) !== -1) {
-                filePath = publicFolder + '/' + fileName + '.' + fileType
-                //console.log('A')
-            } else {
-                //console.log('B')
-            }
-            //console.log('filePath', filePath);
-
+            
 
             // console.log(ip);
             // console.log(ip2);
