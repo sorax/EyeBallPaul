@@ -22,21 +22,32 @@ class WebServer {
             const ip = request.socket.address().address;
             const ip2 = request.connection.remoteAddress;
 
+            //console.log('---')
             const url = request.url !== '/' ? request.url : '/index.html'
             //console.log('url', url);
+
+            let responseData = ''
+            if (url === '/config.js') {
+                responseData = '{a:2}'
+                console.log('responseData', responseData)
+            }
 
             const fileType = url.split('.').slice(-1)
             //console.log(fileType)
 
             const fileName = url.split('/')[1].split('.')[0]
-            //console.log('fileName', fileName);
+            //console.log('fileName', fileName + '.' + fileType);
 
             let filePath = publicFolder + '/404.html'
+            //console.error(publicFiles[fileType].indexOf(fileName))
+
             if (publicFiles[fileType].indexOf(fileName) !== -1) {
                 filePath = publicFolder + '/' + fileName + '.' + fileType
+                //console.log('A')
+            } else {
+                //console.log('B')
             }
             //console.log('filePath', filePath);
-
 
 
             // console.log(ip);
@@ -47,18 +58,25 @@ class WebServer {
             // response.end()
 
 
-            fs.readFile(filePath, function (error, data) {
-                response.writeHead(200, { 'Content-Type': contentTypes[fileType] });
-                response.write(data);
-                response.end();
-            });
+            //console.log('readFile')
+            try {
+                fs.readFile(filePath, function (error, data) {
+                    responseData = data
+                });
+            } catch (e) {
+                console.log(e)
+            }
+
+            response.writeHead(200, { 'Content-Type': contentTypes[fileType] });
+            response.write(responseData);
+            response.end();
         })
         server.listen(port, error => {
             if (error) {
-                return console.log('something bad happened', error)
+                return console.log('WebServer could not be started', error)
             }
-            ip = server.address()
-            console.log('WebServer is listening on:', ip, port)
+            const ip = server.address()
+            console.log('WebServer is now listening on:', ip, port)
         });
     }
 };
