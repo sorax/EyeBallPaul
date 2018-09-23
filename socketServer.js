@@ -13,21 +13,21 @@ console.log(port)
 // });
 
 class SocketServer {
-    constructor(height, width) {
-        this.name = 'Rectangle';
-        this.height = height;
-        this.width = width;
-    }
+  constructor(height, width) {
+    this.name = 'Rectangle';
+    this.height = height;
+    this.width = width;
+  }
 
-    sayName() {
-        console.log('Hi, I am a ', this.name + '.');
-    }
-    get area() {
-        return this.height * this.width;
-    }
-    set area(value) {
-        this.height = this.width = Math.sqrt(value);
-    }
+  sayName() {
+    console.log('Hi, I am a ', this.name + '.');
+  }
+  get area() {
+    return this.height * this.width;
+  }
+  set area(value) {
+    this.height = this.width = Math.sqrt(value);
+  }
 };
 
 // class Square extends Rectangle {
