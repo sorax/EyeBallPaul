@@ -1,14 +1,43 @@
 body {
-    margin: 0;
+  margin: 0;
+  font-family: sans-serif;
 }
 
 #index {
+  display: block;
+}
+
+  #index a {
+    display: block;
+    text-align: center;
+    height: 50vh;
+    line-height: 50vh;
+    font-size: 18vw;
+  }
+
+@media (orientation: landscape) {
+  #index {
     display: table;
     height: 100vh;
     width: 100%;
+  }
+
+  #index a {
+    display: table-cell;
+    line-height: 100vh;
+    font-size: 9vw;
+  }
 }
 
 #index a {
-    display: table-cell;
-    text-align: center;
+  text-decoration: none;
+  color: #fff;
+}
+
+#index a.controller {
+  background: rgb(0,176,111);
+}
+
+#index a.observer {
+  background: rgb(255,66,0);
 }

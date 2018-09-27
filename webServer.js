@@ -1,5 +1,3 @@
-console.log('webServer.js')
-
 const http = require('http')
 const fs = require('fs')
 const httpPort = process.env.npm_package_config_http_port
@@ -19,11 +17,10 @@ class WebServer {
 
       if (request.url === '/config.js') {
         response.writeHead(200, { 'Content-Type': contentTypes['js'] });
-        response.write(`const = '${ip}:${wsPort}';`);
+        response.write(`const wssAddress = '${ip}:${wsPort}';`);
         response.end();
       } else {
         const url = request.url === '/' ? '/index.html' : request.url
-        // console.log(url)
 
         fs.readFile(publicFolder + url, (error, data) => {
           if (!error) {
