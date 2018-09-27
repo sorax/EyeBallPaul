@@ -17,7 +17,7 @@ class WebServer {
 
       if (request.url === '/config.js') {
         response.writeHead(200, { 'Content-Type': contentTypes['js'] });
-        response.write(`const wssAddress = '${ip}:${wsPort}';`);
+        response.write(`const wssAddress = '[${ip}]:${wsPort}';`);
         response.end();
       } else {
         const url = request.url === '/' ? '/index.html' : request.url

@@ -41,3 +41,184 @@ body {
 #index a.observer {
   background: rgb(255,66,0);
 }
+
+
+
+html {
+	height: 100%;
+	background: rgb(0,0,0);
+}
+
+body {
+	margin: 0;
+	height: 100%;
+	font-family: sans-serif;
+	background: rgb(61,70,73);
+	overflow: hidden;
+	-webkit-text-size-adjust: 100%;
+
+}
+
+#connection {
+	display: block;
+	height: 100%;
+	line-height: 100vh;
+	color: #eee;
+	font-size: 10vw;
+	text-align: center;
+}
+
+#login {
+	display: none;
+}
+
+	#login-name {
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		text-align: center;
+		height: 50vh;
+		border: none;
+		font-size: 10vw;
+	}
+
+	#login-send {
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		text-align: center;
+		height: 50vh;
+		border: none;
+		font-size: 10vw;
+	}
+
+		#login-send.team1 {
+			color: #fff;
+			background: rgb(0,176,111);
+		}
+
+		#login-send.team2 {
+			color: #fff;
+			background: rgb(255,66,0);
+		}
+
+
+#play {
+	display: none;
+	height: 100%;
+}
+
+	#play-deg {
+		position: relative;
+		top: 50%;
+		margin: 0;
+		transform: translateY(-50%);
+
+	}
+
+/*
+#log {
+	display: none;
+}
+*/
+
+
+/*
+#name,
+#play,
+#deg,
+#log {
+	border: none;
+
+	outline: none;
+}
+
+
+#name {
+	font-size: 15vh;
+}
+
+#play {
+	color: #fff;
+	bottom: 0;
+	font-size: 10vh;
+}
+
+#deg {
+	display: none;
+	background: transparent;
+}
+	#deg.team1 {}
+	#deg.team2 {}
+
+#log {
+	display: none;
+	top: 5vh;
+	left: 0;
+	right: 0;
+	color: rgb(255,255,255);
+	font-size: 5vh;
+	text-align: center;
+}
+*/
+
+
+
+input[type=range] {
+	width: 100%;
+	-webkit-appearance: none;
+}
+
+input[type=range]:focus {
+	outline: none;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+	width: 100%;
+	height: 10vh;
+	cursor: pointer;
+	background: rgb(45,47,49);
+}
+
+input[type=range]::-webkit-slider-thumb {
+	height: 20vh;
+	width: 20vh;
+	border-radius: 100%;
+	background: rgb(255,255,255);
+	cursor: pointer;
+	-webkit-appearance: none;
+	margin-top: -5vh;
+}
+
+	input[type=range].team1::-webkit-slider-thumb {
+		background: rgb(0,176,111);
+	}
+	input[type=range].team2::-webkit-slider-thumb {
+		background: rgb(255,66,0);
+	}
+
+input[type=range]:focus::-webkit-slider-runnable-track {
+	background: rgb(45,47,49);
+}
+
+input[type=range]::-moz-range-track {
+	width: 100%;
+	height: 10vh;
+	cursor: pointer;
+	background: rgb(45,47,49);
+}
+
+input[type=range]::-moz-range-thumb {
+	height: 20vh;
+	width: 20vh;
+	border-radius: 100%;
+	background: rgb(255,255,255);
+	cursor: pointer;
+}
+
+	input[type=range].team1::-moz-range-thumb {
+		background: rgb(0,176,111);
+	}
+	input[type=range].team2::-moz-range-thumb {
+		background: rgb(255,66,0);
+	}

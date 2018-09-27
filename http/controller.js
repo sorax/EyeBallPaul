@@ -1,14 +1,10 @@
 'use strict';
 
-var wsIP = '127.0.0.1';
-//var wsIP = '192.168.0.14';
-var wsPort = 63555;
-
 var controller = new Controller(),
 	webSocket;
 
 $(document).ready(function () {
-	controller.init({wsIP: wsIP, wsPort: wsPort});
+	controller.init(wssAddress);
 });
 
 function Controller () {
@@ -38,9 +34,9 @@ function Controller () {
 		$('#login').css('display', 'none');
 	};
 
-	this.init = function (config) {
+	this.init = function (wssAddress) {
 		setEvents();
-		webSocket = new WebSocketClient(config.wsIP, config.wsPort);
+		webSocket = new WebSocketClient(wssAddress);
 	};
 
 	// PRIVATE
@@ -105,8 +101,7 @@ function WebSocketClient () {
 
 	// PRIVATE
 	var that = this,
-		wsIP = arguments[0],
-		wsPort = arguments[1];
+		wssAddress = arguments[0];
 	var socket;
 	var reconnectTimeout,
 		reconnectTime = 2000,
@@ -116,7 +111,7 @@ function WebSocketClient () {
 		//console.log('WebSocket Connect');
 		$('#connection').text('Connecting ...');
 
-		socket = new WebSocket('ws://' + wsIP + ':' + wsPort);
+		socket = new WebSocket('ws://' + wssAddress);
 
 		setEvents();
 	};
