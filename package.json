@@ -3,6 +3,7 @@
   "description": "",
   "version": "0.0.1",
   "config": {
+    "http_dir": "http",
     "http_port": "8080",
     "ws_port": "63555"
   },

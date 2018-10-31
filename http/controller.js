@@ -1,171 +1,104 @@
-'use strict';
+'use strict'
 
-var controller = new Controller(),
-	webSocket;
+//   get area() {
+//     return this.height * this.width;
+//   }
+//   set area(value) {
+//     this.height = this.width = Math.sqrt(value);
+//   }
 
-$(document).ready(function () {
-	controller.init(wssAddress);
-});
+document.addEventListener('DOMContentLoaded', () => {
+  const controller = new Controller(wsAddress)
+})
 
-function Controller () {
-	// PUBLIC
-	this.onDataReceived = function (data) {
-		//console.log('Received: ', data);
-		switch (data.type) {
-			case 'setTeam':
-				setTeam(data.team);
-			break;
-		}
-	};
+class Controller {
+  constructor(wsAddress) {
+    this.player = {}
 
-	this.onConnectionEstablished = function () {
-		$('#connection').css('display', 'none');
-		$('#login').css('display', 'block');
+    this.setEvents()
+    this.webSocket = new WebSocketClient(wsAddress)
+  }
 
-		// Set client type
-		webSocket.send({
-			type: 'setClientType',
-			clientType: 'controller'
-		});
-	};
+  onConnectionEstablished() {
+    $('#connection').css('display', 'none')
+    $('#login').css('display', 'block')
 
-	this.onConnectionClosed = function () {
-		$('#connection').css('display', 'block');
-		$('#login').css('display', 'none');
-	};
+    // Set client type
+    this.webSocket.send({
+      type: 'setClientType',
+      clientType: 'controller',
+    })
+  }
 
-	this.init = function (wssAddress) {
-		setEvents();
-		webSocket = new WebSocketClient(wssAddress);
-	};
+  onDataReceived(data) {
+    //console.log('Received: ', data);
+    switch (data.type) {
+      case 'setTeam':
+        setTeam(data.team)
+        break
+    }
+  }
 
-	// PRIVATE
-	var player = {};
+  onConnectionClosed() {
+    $('#connection').css('display', 'block')
+    $('#login').css('display', 'none')
+  }
 
-	var setEvents = function () {
-		if (localStorage.getItem('playerName') !== '') {
-			player.name = localStorage.getItem('playerName');
-		} else {
-			player.name = '';
-		}
+  setTeam(team) {
+    this.player.team = team
+    $('#login-send').attr('class', 'team' + this.player.team)
+    $('#play-deg').attr('class', 'team' + this.player.team)
+  }
 
-		var loginName = $('#login-name');
-		var loginSend = $('#login-send');
+  setEvents() {
+    // Listen for the event.
+    document.addEventListener(
+      'onWebSocketOpen',
+      () => {
+        this.onConnectionEstablished()
+      },
+      false,
+    )
 
-		loginName.val(player.name).focus();
-		loginName.on('keyup', function (event) {
-			if (event.keyCode === 13) {
-				loginSend.click();
-			}
-		});
+    if (localStorage.getItem('playerName') !== '') {
+      this.player.name = localStorage.getItem('playerName')
+    } else {
+      this.player.name = ''
+    }
 
-		loginSend.on('click', function () {
-			player.name = loginName.val();
+    var loginName = $('#login-name')
+    var loginSend = $('#login-send')
 
-			if (player.name === '') {
-				alert("Bitte Name ausfüllen");
-			} else {
-				localStorage.setItem('playerName', player.name);
+    loginName.val(this.player.name).focus()
+    loginName.on('keyup', event => {
+      if (event.keyCode === 13) {
+        loginSend.click()
+      }
+    })
 
-				$('#login').css('display', 'none');
-				$('#play').css('display', 'block');
+    loginSend.on('click', () => {
+      this.player.name = loginName.val()
 
-				webSocket.send({
-					type: 'setName',
-					name: player.name
-				});
-			}
-		});
+      if (this.player.name === '') {
+        alert('Bitte Name ausfüllen')
+      } else {
+        localStorage.setItem('playerName', this.player.name)
 
+        $('#login').css('display', 'none')
+        $('#play').css('display', 'block')
 
-		$('#play-deg').on('input', function () {
-			webSocket.send({
-				type: 'setDeg',
-				deg: $(this).val()
-			});
-		});
-	};
+        this.webSocket.send({
+          type: 'setName',
+          name: this.player.name,
+        })
+      }
+    })
 
-	var setTeam = function (team) {
-		player.team = team;
-		$('#login-send').attr('class', 'team' + player.team);
-		$('#play-deg').attr('class', 'team' + player.team);
-	};
-}
-
-function WebSocketClient () {
-	// PUBLIC
-	this.send = function (data) {
-		socket.send(JSON.stringify(data));
-	};
-
-	// PRIVATE
-	var that = this,
-		wssAddress = arguments[0];
-	var socket;
-	var reconnectTimeout,
-		reconnectTime = 2000,
-		reconnectCount = 0;
-
-	var connect = function () {
-		//console.log('WebSocket Connect');
-		$('#connection').text('Connecting ...');
-
-		socket = new WebSocket('ws://' + wssAddress);
-
-		setEvents();
-	};
-
-	var setEvents = function () {
-		socket.onopen = function () {
-			reconnectCount = 0;
-			//console.log('WebSocket Open: (STATUS: ' + socket.readyState + ')');
-			//$('#connection').text('Connected');
-
-			controller.onConnectionEstablished();
-			//onOpen();
-		};
-
-		socket.onmessage = function (message) {
-			//console.log('Received: %s', message.data);
-
-			var data = JSON.parse(message.data);
-			//console.log(data);
-
-			controller.onDataReceived(data);
-			//onMessage(data);
-		};
-
-		socket.onerror = function (error) {
-			//console.log('WebSocket Error: ' + error);
-		};
-
-		socket.onclose = function () {
-			//console.log('WebSocket Close');
-
-			controller.onConnectionClosed();
-			//onClose();
-			reConnect();
-		};
-	};
-
-	var reConnect = function () {
-		clearTimeout(reconnectTimeout);
-		reconnectCount++;
-
-		//console.log('WebSocket ReConnect ('+reconnectCount+')');
-		$('#connection').text('ReConnecting ('+reconnectCount+')...');
-
-		reconnectTimeout = setTimeout(function () {
-			connect();
-		}, reconnectTime);
-	};
-
-	var init = function () {
-		//$('#connection').text('Connecting ...');
-		connect();
-	};
-
-	// INIT
-	init();
+    $('#play-deg').on('input', event => {
+      this.webSocket.send({
+        type: 'setDeg',
+        deg: $(event.currentTarget).val(),
+      })
+    })
+  }
 }
