@@ -1,12 +1,5 @@
 'use strict'
 
-//   get area() {
-//     return this.height * this.width;
-//   }
-//   set area(value) {
-//     this.height = this.width = Math.sqrt(value);
-//   }
-
 document.addEventListener('DOMContentLoaded', () => {
   const controller = new Controller(wsAddress)
 })
@@ -52,13 +45,9 @@ class Controller {
 
   setEvents() {
     // Listen for the event.
-    document.addEventListener(
-      'onWebSocketOpen',
-      () => {
-        this.onConnectionEstablished()
-      },
-      false,
-    )
+    window.listen('onWebSocketOpen', () => {
+      this.onConnectionEstablished()
+    })
 
     if (localStorage.getItem('playerName') !== '') {
       this.player.name = localStorage.getItem('playerName')

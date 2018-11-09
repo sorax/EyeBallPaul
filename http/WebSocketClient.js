@@ -22,13 +22,8 @@ class WebSocketClient {
       console.log('WebSocket Open: (STATUS: ' + this.socket.readyState + ')')
       $('#connection').text('Connected')
 
-      const event = new Event('onWebSocketOpen')
-
-      document.dispatchEvent(event)
-
-      // onConnectionEstablished()
-      //       //onOpen();
-      //     };
+      window.emit('onWebSocketOpen')
+      //onOpen();
 
       this.send('hello')
     }
