@@ -7,7 +7,7 @@
 
   function CustomEvent(event, params) {
     params = params || { bubbles: false, cancelable: false, detail: undefined }
-    var evt = document.createEvent('CustomEvent')
+    const evt = document.createEvent('CustomEvent')
     evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail)
     return evt
   }
@@ -17,22 +17,38 @@
   window.CustomEvent = CustomEvent
 })()
 
-// class Store {
-//   constructor() {
-//     this._state = {}
-//   }
+class Store {
+  constructor() {
+    this.data = {
+      user: {
+        address: {
+          street: 'Mustergasse',
+        },
+        alternate: {
+          foo: 'bar',
+        },
+      },
+    }
+  }
 
-//   get state() {
-//     return this._state
-//   }
+  get(path) {
+    return path.split('.').reduce((a, v) => a[v], this.data)
+  }
 
-//   set state(data) {
-//     this._state = data
-//   }
-// }
-// window.store = new Store()
-// window.store.state = 'alice'
-// console.log(window.store.state)
+  set(path, value) {
+    const obj = this.data
+    const keys = path.split('.')
+    const lastKey = keys.pop()
+    const lastObj = keys.reduce((obj, key) => (obj[key] = obj[key] || {}), obj)
+    lastObj[lastKey] = value
+
+    // console.log(this.data)
+  }
+}
+
+window.store = new Store()
+window.store.set('user.address.street', 'haufegasee')
+console.log(window.store.get('user'))
 
 //
 
