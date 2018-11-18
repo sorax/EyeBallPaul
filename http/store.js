@@ -30,7 +30,7 @@ window.emit = function(key, data) {
     window.dispatchEvent(
       new CustomEvent(key, {
         detail: data,
-        // bubbles: true,
+        bubbles: false,
         // cancelable: true,
       }),
     )
@@ -43,33 +43,38 @@ window.listen('onStateChange', event => {
   console.log('state changed on path', event.detail)
 })
 
-class Store {
-  constructor() {
-    this._data = {}
+function Store() {
+  var data = {}
+
+  this.get = path => {
+    return !path
+      ? data
+      : path
+          .split('.')
+          .reduce((obj, key) => (obj && obj[key] ? obj[key] : undefined), data)
   }
 
-  get(path = '') {
-    return path
-      .split('.')
-      .reduce(
-        (obj, key) => (obj && obj[key] ? obj[key] : undefined),
-        this._data,
-      )
-  }
-
-  set(path, value) {
+  this.set = (path, value) => {
     if (JSON.stringify(value) !== JSON.stringify(this.get(path))) {
       window.emit('onStateChange', path)
-      const obj = this._data
+
       const keys = path.split('.')
       const lastKey = keys.pop()
       const lastObj = keys.reduce(
         (obj, key) => (obj[key] = obj[key] || {}),
-        obj,
+        data,
       )
       lastObj[lastKey] = value
     }
   }
+
+  // this.watch = (path, func) => {
+  //   // onStateChange
+  //   console.log('WATCH', path, func)
+  // }
 }
 window.store = window.store || new Store()
-window.store.set('a.b.c', { a: { b: { c: 2 } } })
+
+// window.store.watch('a.b.c', event => {
+//   console.log('state changed on path', event.detail)
+// })

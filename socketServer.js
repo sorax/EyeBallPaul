@@ -1,135 +1,161 @@
 const WebSocket = require('ws')
 
+class Ball {
+  constructor() {
+    this.x = 0
+    this.y = 0
+    this.deg = 0 //Math.random() * 360;
+    this.speed = 1
+    this.lastCollision = null
+  }
+}
+
 class SocketServer {
   constructor(wsPort) {
-    const connections = {}
+    this.connections = {}
+    this.observers = {}
+    this.players = {}
+    this.teams = { 1: {}, 2: {} }
+    this.balls = [new Ball()]
+
+    this.allDefenseSizePercent = 20
+    this.teamDefenceSizePercent = this.allDefenseSizePercent / 2
 
     console.log('SocketServer is now listening on port', wsPort)
 
     this.wss = new WebSocket.Server({ port: wsPort })
-    this.wss.on('connection', function(ws, req) {
+    this.wss.on('connection', (ws, req) => {
       const id = req.headers['sec-websocket-key']
+      // const ip = req.connection.remoteAddress;
+
       // console.log(`New client connected (id: ${id})`)
 
-      connections[id] = {} // add to connections
+      this.connections[id] = {}
 
-      // var ip = req.connection.remoteAddress
-      // console.log(address)
-
-      // console.log(connections)
-
-      ws.on('message', function(message) {
+      ws.on('message', message => {
         // console.log('Received: %s', message)
 
         const data = JSON.parse(message)
-        console.log(data)
+        // console.log(data)
+
+        switch (data.type) {
+          case 'setClientType':
+            this.connections[id].type = data.clientType
+
+            if (data.clientType === 'controller') {
+              this.players[id] = this.connections[id]
+              this.players[id].id = id
+              this.players[id].points = 0
+              this.players[id].name = ''
+              this.players[id].deg = 0
+
+              if (
+                Object.keys(this.teams[1]).length <=
+                Object.keys(this.teams[2]).length
+              ) {
+                this.players[id].team = 1
+                this.teams[1][id] = this.players[id]
+              } else {
+                this.players[id].team = 2
+                this.teams[2][id] = this.players[id]
+              }
+
+              // console.log(
+              //   `Teams are (${Object.keys(this.teams[1]).length}|${
+              //     Object.keys(this.teams[2]).length
+              //   })`,
+              // )
+
+              ws.send(
+                JSON.stringify({
+                  type: 'setTeam',
+                  team: this.players[id].team,
+                }),
+              )
+            }
+
+            if (data.clientType === 'observer') {
+              this.observers[id] = this.connections[id]
+
+              ws.send(
+                JSON.stringify({
+                  type: 'setTeam',
+                  team: 1,
+                }),
+              )
+            }
+
+            break
+
+          case 'setName':
+            console.log('set player name', data.name)
+            var name = data.name.toString()
+            //var pattern = /(\w|\d){8}/g;
+            //if (pattern.test(name)) {
+            this.players[id].name = name
+            this.players[id].defenceSize =
+              this.teamDefenceSizePercent /
+              Object.keys(this.teams[this.players[id].team]).length
+            //}
+            break
+
+          case 'setDeg':
+            this.players[id].deg = fixDegrees(parseInt(data.deg))
+
+            // console.log(players[id].deg)
+
+            /*
+						for (var key in observers) {
+							var observer = observers[key];
+							var player = players[id];
+							//var playerWs = player.ws;
+							//delete player.ws;
+
+							observer.ws.send(JSON.stringify({
+								type: 'updatePlayer',
+								player: player
+							}));
+
+							//player.ws = playerWs;
+						}
+						*/
+            break
+
+          case 'getGameState':
+            ws.send(
+              JSON.stringify({
+                type: 'setGameState',
+                balls: this.balls,
+                players: this.players,
+                teams: this.teams,
+              }),
+            )
+            break
+        }
       })
-      ws.on('close', function close() {
+      ws.on('close', () => {
         // console.log(id, this.connections)
         // console.log('Client disconnected (id: ' + id + ')')
-        delete connections[id] // remove from connections
+        delete this.connections[id] // remove from connections
       })
     })
   }
 }
 module.exports = SocketServer
 
+function fixDegrees(degrees) {
+  if (degrees < 0) return degrees + 360
+  if (degrees >= 360) return degrees - 360
+  return degrees
+}
+
 /*
-var observers = {};
-var balls = [new Ball()];
+
 
 wss.on('connection', function (ws, req) {
-	var id = req.headers['sec-websocket-key'];
-	//var ip = req.connection.remoteAddress;
-
-	console.log('New client connected (id: ' + id + ')');
-
-	connections[id] = {
-		//ws: ws,
-		type: false
-	};
-
 	ws.on('message', function (message) {
 		//console.log('Received: %s', message);
-
 		var data = JSON.parse(message);
-
-		switch (data.type) {
-			case 'setClientType':
-				connections[id].type = data.clientType;
-
-				switch (data.clientType) {
-					case 'controller':
-						players[id] = connections[id];
-						players[id].id = id;
-						players[id].points = 0;
-						players[id].name = '';
-						players[id].deg = 0;
-						
-
-						if (Object.keys(teams[1]).length <= Object.keys(teams[2]).length) {
-							players[id].team = 1;
-							teams[1][id] = players[id];
-						} else {
-							players[id].team = 2;
-							teams[2][id] = players[id];
-						}
-
-						console.log('Teams are (' + Object.keys(teams[1]).length + '|' + Object.keys(teams[2]).length + ')');
-
-						ws.send(JSON.stringify({
-							type: 'setTeam',
-							team: players[id].team
-						}));
-						break;
-
-					case 'observer':
-						observers[id] = connections[id];
-						break;
-				}
-				break;
-
-			case 'setName':
-				console.log('set player name');
-				console.log('name:', data.name);
-				var name = data.name.toString();
-				//var pattern = /(\w|\d){8}/g;
-				//if (pattern.test(name)) {
-					players[id].name = name;
-					players[id].defenceSize = teamDefenceSizePercent / Object.keys(teams[players[id].team]).length
-				//}
-				break;
-
-			case 'setDeg':
-				players[id].deg = fixDegrees(parseInt(data.deg));
-
-				/.*
-				for (var key in observers) {
-					var observer = observers[key];
-					var player = players[id];
-					//var playerWs = player.ws;
-					//delete player.ws;
-
-					observer.ws.send(JSON.stringify({
-						type: 'updatePlayer',
-						player: player
-					}));
-
-					//player.ws = playerWs;
-				}
-				*./
-				break;
-
-			case 'getGameState':
-				ws.send(JSON.stringify({
-					type: 'setGameState',
-					balls: balls,
-					teams: teams,
-					players: players
-				}));
-				break;
-
-		}
 	});
 
 	ws.on('close', function close() {
@@ -149,45 +175,8 @@ wss.on('connection', function (ws, req) {
 		}
 	});
 });
-
-
-
 */
-
-// const wss = new WebSocket.Server({ port: 8080 });
 
 // wss.on('connection', function connection(ws, req) {
 //   const ip = req.connection.remoteAddress;
 // });
-
-// class SocketServer {
-//   constructor(height, width) {
-//     this.name = 'Rectangle';
-//     this.height = height;
-//     this.width = width;
-//   }
-
-//   sayName() {
-//     console.log('Hi, I am a ', this.name + '.');
-//   }
-//   get area() {
-//     return this.height * this.width;
-//   }
-//   set area(value) {
-//     this.height = this.width = Math.sqrt(value);
-//   }
-// };
-
-// // class Square extends Rectangle {
-// //     constructor(length) {
-// //         this.height; // ReferenceError, super needs to be called first!
-
-// //         // Here, it calls the parent class' constructor with lengths
-// //         // provided for the Polygon's width and height
-// //         super(length, length);
-
-// //         // Note: In derived classes, super() must be called before you
-// //         // can use 'this'. Leaving this out will cause a reference error.
-// //         this.name = 'Square';
-// //     }
-// // }

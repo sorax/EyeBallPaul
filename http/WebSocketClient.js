@@ -19,21 +19,16 @@ class WebSocketClient {
   setEvents() {
     this.socket.onopen = () => {
       this.reconnectCount = 0
-      console.log('WebSocket Open: (STATUS: ' + this.socket.readyState + ')')
+      // console.log('WebSocket Open: (STATUS: ' + this.socket.readyState + ')')
       $('#connection').text('Connected')
 
       window.emit('onWebSocketOpen')
-      //onOpen();
-
-      this.send('hello')
     }
 
     this.socket.onmessage = message => {
-      console.log('Received: %s', message)
-      // var data = JSON.parse(message.data)
-      //console.log(data);
-      // controller.onDataReceived(data)
-      //onMessage(data);
+      console.log(message)
+      const data = JSON.parse(message.data)
+      window.emit('onWebSocketMessage', data)
     }
 
     this.socket.onerror = error => {

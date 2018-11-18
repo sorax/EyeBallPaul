@@ -13,6 +13,7 @@ class Controller {
   }
 
   onConnectionEstablished() {
+    console.log('onConnectionEstablished')
     $('#connection').css('display', 'none')
     $('#login').css('display', 'block')
 
@@ -24,10 +25,10 @@ class Controller {
   }
 
   onDataReceived(data) {
-    //console.log('Received: ', data);
+    // console.log('Received: ', data)
     switch (data.type) {
       case 'setTeam':
-        setTeam(data.team)
+        this.setTeam(data.team)
         break
     }
   }
@@ -44,9 +45,12 @@ class Controller {
   }
 
   setEvents() {
-    // Listen for the event.
     window.listen('onWebSocketOpen', () => {
       this.onConnectionEstablished()
+    })
+
+    window.listen('onWebSocketMessage', event => {
+      this.onDataReceived(event.detail)
     })
 
     if (localStorage.getItem('playerName') !== '') {
