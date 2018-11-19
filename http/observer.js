@@ -9,6 +9,10 @@ class Observer {
     this.players = {}
     this.balls = []
 
+    this.refreshInterval
+
+    this.foo = 123
+
     this.canvas = document.getElementById('display-canvas')
     this.canvas.height = window.innerHeight
     this.canvas.width = window.innerWidth
@@ -23,8 +27,6 @@ class Observer {
       this.reconnectCount = 0
       //$('#connection').text('Connected');
       this.onConnectionEstablished()
-
-      setInterval(this.getGameState(), 50)
     })
 
     window.listen('onWebSocketMessage', event => {
@@ -46,7 +48,8 @@ class Observer {
   }
 
   onDataReceived(data) {
-    console.log('Received: ', data)
+    // console.log('Received', data)
+
     switch (data.type) {
       // case 'updatePlayer':
       // 	players[player.id] = data.player;
@@ -62,17 +65,23 @@ class Observer {
         var playerDeg = 0
         var playerDefenceSize = 0
         for (var key in this.players) {
-          var player = players[key]
+          var player = this.players[key]
           playerDeg = player.deg
           playerDefenceSize = player.defenceSize
         }
 
-        // $('#debug').html(
-        // 	'Ball: '+JSON.stringify(balls[0].deg)+'<br>'+
-        // 	'Player: '+playerDeg+'<br>'+
-        // 	'PlayerDefenceSize: '+playerDefenceSize+'<br>'+
-        // 	JSON.stringify(players)
-        // );
+        $('#debug').html(
+          'Ball: ' +
+            // JSON.stringify(this.balls[0].deg) +
+            '<br>' +
+            'Player: ' +
+            playerDeg +
+            '<br>' +
+            'PlayerDefenceSize: ' +
+            playerDefenceSize +
+            '<br>' +
+            JSON.stringify(this.players),
+        )
 
         this.context.beginPath()
         this.context.strokeStyle = 'rgb(255,255,255)'
@@ -94,9 +103,13 @@ class Observer {
       type: 'setClientType',
       clientType: 'observer',
     })
+
+    this.refreshInterval = setInterval(this.getGameState.bind(this), 50)
   }
 
   onConnectionClosed() {
+    clearInterval(this.refreshInterval)
+
     $('#connection').css('display', 'block')
     $('#display').css('display', 'none')
   }
@@ -128,7 +141,7 @@ class Observer {
     this.context.stroke()
 
     // draw balls
-    console.log('this.balls', this.balls)
+    // console.log('this.balls', this.balls)
     this.balls.forEach(function(ball, index) {
       this.context.beginPath()
       this.context.fillStyle = 'rgb(255,0,0)' //this.color;
@@ -165,9 +178,9 @@ class Observer {
         getRadiant(playerStartDeg),
         getRadiant(playerEndDeg),
       )
-      console.log('playerStartDeg', playerStartDeg)
-      console.log('playerEndDeg', playerEndDeg)
-      console.log('defenceSize', player.defenceSize)
+      // console.log('playerStartDeg', playerStartDeg)
+      // console.log('playerEndDeg', playerEndDeg)
+      // console.log('defenceSize', player.defenceSize)
       this.context.stroke()
     }
   }
@@ -182,22 +195,22 @@ function getRadiant(degrees) {
   return (degrees * Math.PI) / 180
 }
 
-// function Observer () {
+function getDegrees(degrees) {
+  if (degrees < 0) return degrees + 360
+  if (degrees >= 360) return degrees - 360
+  return degrees
+}
 
-// 	// PRIVATE
+// function Observer () {
 
 // 	var teams = {};
 // 	var players = {};
 
-////
-
 // function WebSocketClient () {
-// 	// PUBLIC
 // 	this.send = function (data) {
 // 		socket.send(JSON.stringify(data));
 // 	};
 
-// 	// PRIVATE
 // 	var that = this,
 // 		wsIP = arguments[0],
 // 		wsPort = arguments[1];
@@ -236,12 +249,6 @@ function getRadiant(degrees) {
 
 // 	// INIT
 // 	init();
-// }
-
-// function getDegrees(degrees) {
-// 	if (degrees < 0) return degrees + 360;
-// 	if (degrees >= 360) return degrees - 360;
-// 	return degrees;
 // }
 
 // // 'use strict';

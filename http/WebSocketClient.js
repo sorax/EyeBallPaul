@@ -26,7 +26,7 @@ class WebSocketClient {
     }
 
     this.socket.onmessage = message => {
-      console.log(message)
+      // console.log(message)
       const data = JSON.parse(message.data)
       window.emit('onWebSocketMessage', data)
     }

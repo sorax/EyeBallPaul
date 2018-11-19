@@ -4,9 +4,10 @@ class Ball {
   constructor() {
     this.x = 0
     this.y = 0
-    this.deg = 0 //Math.random() * 360;
+    this.deg = Math.random() * 360
     this.speed = 1
     this.lastCollision = null
+    // this.color = '#00f'
   }
 }
 
@@ -18,7 +19,7 @@ class SocketServer {
     this.teams = { 1: {}, 2: {} }
     this.balls = [new Ball()]
 
-    this.allDefenseSizePercent = 20
+    this.allDefenseSizePercent = 50
     this.teamDefenceSizePercent = this.allDefenseSizePercent / 2
 
     console.log('SocketServer is now listening on port', wsPort)
@@ -31,6 +32,7 @@ class SocketServer {
       // console.log(`New client connected (id: ${id})`)
 
       this.connections[id] = {}
+      // this.connections[id].ws = ws
 
       ws.on('message', message => {
         // console.log('Received: %s', message)
@@ -44,7 +46,6 @@ class SocketServer {
 
             if (data.clientType === 'controller') {
               this.players[id] = this.connections[id]
-              this.players[id].id = id
               this.players[id].points = 0
               this.players[id].name = ''
               this.players[id].deg = 0
@@ -60,35 +61,29 @@ class SocketServer {
                 this.teams[2][id] = this.players[id]
               }
 
-              // console.log(
-              //   `Teams are (${Object.keys(this.teams[1]).length}|${
-              //     Object.keys(this.teams[2]).length
-              //   })`,
-              // )
-
               ws.send(
                 JSON.stringify({
                   type: 'setTeam',
                   team: this.players[id].team,
                 }),
               )
+
+              // console.log(
+              //   `Teams are (${Object.keys(this.teams[1]).length}|${
+              //     Object.keys(this.teams[2]).length
+              //   })`,
+              // )
             }
 
             if (data.clientType === 'observer') {
               this.observers[id] = this.connections[id]
-
-              ws.send(
-                JSON.stringify({
-                  type: 'setTeam',
-                  team: 1,
-                }),
-              )
+              this.observers[id].ws = ws
             }
 
             break
 
           case 'setName':
-            console.log('set player name', data.name)
+            // console.log('set player name', data.name)
             var name = data.name.toString()
             //var pattern = /(\w|\d){8}/g;
             //if (pattern.test(name)) {
@@ -102,26 +97,30 @@ class SocketServer {
           case 'setDeg':
             this.players[id].deg = fixDegrees(parseInt(data.deg))
 
-            // console.log(players[id].deg)
+            // Broadcast to everyone else.
+            // wss.clients.forEach(function each(client) {
+            //   if (client !== ws && client.readyState === WebSocket.OPEN) {
+            //     client.send(data)
+            //   }
+            // })
 
-            /*
-						for (var key in observers) {
-							var observer = observers[key];
-							var player = players[id];
-							//var playerWs = player.ws;
-							//delete player.ws;
+            for (var key in this.observers) {
+              var observer = this.observers[key]
+              // var player = this.players[id]
+              //var playerWs = player.ws;
+              //delete player.ws;
 
-							observer.ws.send(JSON.stringify({
-								type: 'updatePlayer',
-								player: player
-							}));
-
-							//player.ws = playerWs;
-						}
-						*/
+              observer.ws.send(
+                JSON.stringify({
+                  type: 'updatePlayer',
+                  player: this.players[id],
+                }),
+              )
+            }
             break
 
           case 'getGameState':
+            // console.log('getGameState')
             ws.send(
               JSON.stringify({
                 type: 'setGameState',
@@ -137,6 +136,14 @@ class SocketServer {
         // console.log(id, this.connections)
         // console.log('Client disconnected (id: ' + id + ')')
         delete this.connections[id] // remove from connections
+        delete this.observers[id]
+        delete this.players[id]
+        delete this.teams[1][id]
+        delete this.teams[2][id]
+
+        // if (Object.keys(players).length === 0) {
+        //   clearInterval(tickInterval)
+        // }
       })
     })
   }
