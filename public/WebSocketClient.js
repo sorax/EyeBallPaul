@@ -11,16 +11,19 @@ class WebSocketClient {
     this.connect()
     this.setEvents()
   }
+
   connect() {
-    // console.log('WebSocket Connect')
-    $('#connection').text('Connecting ...')
+    console.log('WebSocket Connect')
+    window.emit('onWebSocketConnect', JSON.parse(this.reconnectCount))
     this.socket = new WebSocket('ws://' + this.wsAddress)
   }
+
   setEvents() {
     this.socket.onopen = () => {
+      clearInterval(this.reconnectTimeout)
       this.reconnectCount = 0
       // console.log('WebSocket Open: (STATUS: ' + this.socket.readyState + ')')
-      $('#connection').text('Connected')
+      // $('#connection').text('Connected')
 
       window.emit('onWebSocketOpen')
     }
@@ -32,11 +35,18 @@ class WebSocketClient {
     }
 
     this.socket.onerror = error => {
-      console.log('WebSocket Error: ' + error)
+      console.log('WebSocket Error')
+      console.log(error)
     }
 
     this.socket.onclose = () => {
       console.log('WebSocket Close')
+      window.emit('onWebSocketClosed')
+
+      this.reconnectTimeout = setInterval(
+        this.connect.bind(this),
+        this.reconnectTime,
+      )
     }
   }
   send(data) {

@@ -1,3 +1,32 @@
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+/*
+*
+* ###
+*
+*/
+
 html {
   height: 100%;
   background: rgb(0, 0, 0);
@@ -163,4 +192,32 @@ body {
 }
 #controller input[type='range'].team2::-moz-range-thumb {
   background: rgb(255, 66, 0);
+}
+
+#observer #connection {
+  display: block;
+  height: 100%;
+  line-height: 100vh;
+  color: #eee;
+  font-size: 10vw;
+  text-align: center;
+}
+
+#observer #display {
+  display: none;
+  height: 100%;
+}
+
+#observer #display-canvas {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+#observer #debug {
+  position: absolute;
+  display: inline;
+  padding: 0.2em;
+  color: #eee;
+  background: #222;
 }

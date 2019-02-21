@@ -34,6 +34,8 @@ class Controller {
   }
 
   onConnectionClosed() {
+    console.log('onConnectionClosed')
+    $('#connection').text('Reconnecting ...')
     $('#connection').css('display', 'block')
     $('#login').css('display', 'none')
   }
@@ -45,8 +47,17 @@ class Controller {
   }
 
   setEvents() {
+    window.listen('onWebSocketConnect', event => {
+      console.log('event.detail', event.detail)
+      $('#connection').text('Connecting ...')
+    })
+
     window.listen('onWebSocketOpen', () => {
       this.onConnectionEstablished()
+    })
+
+    window.listen('onWebSocketClosed', () => {
+      this.onConnectionClosed()
     })
 
     window.listen('onWebSocketMessage', event => {

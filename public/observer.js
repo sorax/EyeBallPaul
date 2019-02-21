@@ -11,8 +11,6 @@ class Observer {
 
     this.refreshInterval
 
-    this.foo = 123
-
     this.canvas = document.getElementById('display-canvas')
     this.canvas.height = window.innerHeight
     this.canvas.width = window.innerWidth

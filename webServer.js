@@ -1,56 +1,35 @@
-const http = require('http')
-const fs = require('fs')
-const publicFolder = process.env.npm_package_config_http_dir
-const contentTypes = {
-  html: 'text/html',
-  css: 'text/css',
-  js: 'text/javascript',
-}
+const httpPort = process.env.npm_package_config_http_port
+const wsPort = process.env.npm_package_config_ws_port
 
-class WebServer {
-  constructor(httpPort, wsPort) {
-    const server = http.createServer(function(request, response) {
-      const address = request.socket.address()
+const express = require('express')
+const app = express()
 
-      if (request.url === '/config.js') {
-        const wsIp =
-          address.family === 'IPv6'
-            ? `[${address.address}]`
-            : `${address.address}`
-        const wsAddress = `127.0.0.1:${wsPort}` //`${wsIp}:${wsPort}`
-        response.writeHead(200, { 'Content-Type': contentTypes['js'] })
-        response.write(`const wsAddress = '${wsAddress}';`)
-        response.end()
-      } else {
-        const url = request.url === '/' ? '/index.html' : request.url
+app.get('/config.js', function(req, res) {
+  // const wsIp =
+  //   address.family === 'IPv6' ? `[${address.address}]` : `${address.address}`
+  // const wsAddress = `127.0.0.1:${wsPort}` //`${wsIp}:${wsPort}`
+  // res.send(`const wsAddress = '${wsAddress}';`)
 
-        fs.readFile(publicFolder + url, (error, data) => {
-          if (!error) {
-            response.writeHead(200, {
-              'Content-Type': contentTypes[url.split('.').slice(-1)],
-            })
-            response.write(data)
-            response.end()
-          } else {
-            fs.readFile(publicFolder + '/404.html', (error, data) => {
-              if (error) {
-                throw error
-              }
-              response.writeHead(404, { 'Content-Type': contentTypes['html'] })
-              response.write(data)
-              response.end()
-            })
-          }
-        })
-      }
-    })
-    server.listen(httpPort, error => {
-      if (error) {
-        console.log('WebServer could not be started', error)
-        return
-      }
-      console.log('WebServer is now listening on:', server.address(), httpPort)
-    })
-  }
-}
-module.exports = WebServer
+  res.set('Content-Type', 'text/javascript')
+  res.send(`const wsAddress = '127.0.0.1:${wsPort}';`)
+
+  // res.json({ testData: 'foobar' })
+})
+
+app.use(express.static('public'))
+
+app.use(function(req, res, next) {
+  res.status(404).sendFile(__dirname + '/public/404.html')
+})
+
+app.listen(httpPort, function() {
+  const family = this.address().family
+  const host = this.address().address
+  const port = this.address().port
+  console.log(
+    'EyeBallPaul Server listening at http://%s:%s (%s)',
+    host,
+    port,
+    family,
+  )
+})
