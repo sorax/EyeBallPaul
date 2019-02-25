@@ -5,15 +5,22 @@
 }
 
 html {
+  /* background: rgb(0, 0, 0); */
   box-sizing: border-box;
 }
 
 html,
 body {
-  height: 100%;
   margin: 0;
   padding: 0;
+  height: 100%;
   width: 100%;
+}
+
+body {
+  font-family: sans-serif;
+  /* overflow: hidden; */
+  /* -webkit-text-size-adjust: 100%; */
 }
 
 #root {
@@ -22,27 +29,9 @@ body {
 }
 
 /*
-*
-* ###
-*
-*/
-
-html {
-  height: 100%;
-  background: rgb(0, 0, 0);
-}
-
-body {
-  margin: 0;
-  height: 100%;
-  font-family: sans-serif;
-  background: rgb(61, 70, 73);
-  overflow: hidden;
-  -webkit-text-size-adjust: 100%;
-}
-
+ * Index
+ */
 #index {
-  display: block;
 }
 
 #index a {
@@ -78,6 +67,15 @@ body {
 
 #index a.observer {
   background: rgb(255, 66, 0);
+}
+
+/*
+ * Controller 
+ */
+#controller {
+  background: rgb(61, 70, 73);
+}
+#controller-status {
 }
 
 #controller #connection {
@@ -194,6 +192,10 @@ body {
   background: rgb(255, 66, 0);
 }
 
+/*
+ * Observer
+ */
+/*
 #observer #connection {
   display: block;
   height: 100%;
@@ -220,4 +222,4 @@ body {
   padding: 0.2em;
   color: #eee;
   background: #222;
-}
+} */
