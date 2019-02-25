@@ -1,5 +1,7 @@
-// // const SocketServer = require('./socketServer.js')
-// // new SocketServer(wsPort)
+const wsPort = process.env.npm_package_config_ws_port
+
+const SocketServer = require('./socketServer.js')
+new SocketServer(wsPort)
 
 require('./webServer.js')
 
