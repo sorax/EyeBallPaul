@@ -12,16 +12,38 @@ class Controller {
     this.webSocket = new WebSocketClient(wsAddress)
   }
 
-  onConnectionEstablished() {
-    console.log('onConnectionEstablished')
-    $('#connection').css('display', 'none')
-    $('#login').css('display', 'block')
+  showConnectionScreen() {
+    $('#connection').css('display', 'block')
+  }
 
-    // Set client type
+  hideConnectionScreen() {
+    $('#connection').css('display', 'none')
+  }
+
+  showLoginScreen() {
+    $('#login').css('display', 'block')
+  }
+
+  hideLoginScreen() {
+    $('#login').css('display', 'none')
+  }
+
+  showPlayScreen() {
+    $('#play').css('display', 'block')
+  }
+
+  sendClientType() {
     this.webSocket.send({
       type: 'setClientType',
       clientType: 'controller',
     })
+  }
+
+  onConnectionEstablished() {
+    console.log('onConnectionEstablished')
+    this.hideConnectionScreen()
+    this.showLoginScreen()
+    this.sendClientType()
   }
 
   onDataReceived(data) {
@@ -36,8 +58,8 @@ class Controller {
   onConnectionClosed() {
     console.log('onConnectionClosed')
     $('#connection').text('Reconnecting ...')
-    $('#connection').css('display', 'block')
-    $('#login').css('display', 'none')
+    this.showConnectionScreen()
+    this.this.hideLoginScreen()
   }
 
   setTeam(team) {
@@ -88,8 +110,8 @@ class Controller {
       } else {
         localStorage.setItem('playerName', this.player.name)
 
-        $('#login').css('display', 'none')
-        $('#play').css('display', 'block')
+        this.hideLoginScreen()
+        this.showPlayScreen()
 
         this.webSocket.send({
           type: 'setName',
