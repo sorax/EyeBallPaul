@@ -18,7 +18,7 @@
 })()
 
 // window.events = window.events || {}
-window.listen = function(key, func) {
+window.on = function(key, func) {
   window.addEventListener(key, func, false)
 }
 window.off = function(key, func) {
@@ -39,11 +39,11 @@ window.emit = function(key, data) {
   }
 }
 
-window.listen('onStateChange', event => {
+window.on('onStateChange', event => {
   console.log('state changed on path', event.detail)
 })
 
-function Store() {
+function State() {
   var data = {}
 
   this.get = path => {
@@ -73,8 +73,8 @@ function Store() {
   //   console.log('WATCH', path, func)
   // }
 }
-window.store = window.store || new Store()
+window.state = window.state || new State()
 
-// window.store.watch('a.b.c', event => {
+// window.state.watch('a.b.c', event => {
 //   console.log('state changed on path', event.detail)
 // })

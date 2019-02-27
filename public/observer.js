@@ -21,13 +21,13 @@ class Observer {
   }
 
   setEvents() {
-    window.listen('onWebSocketOpen', () => {
+    window.on('onWebSocketOpen', () => {
       this.reconnectCount = 0
       //$('#connection').text('Connected');
       this.onConnectionEstablished()
     })
 
-    window.listen('onWebSocketMessage', event => {
+    window.on('onWebSocketMessage', event => {
       this.onDataReceived(event.detail)
     })
 

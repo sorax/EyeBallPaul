@@ -69,20 +69,20 @@ class Controller {
   }
 
   setEvents() {
-    window.listen('onWebSocketConnect', event => {
+    window.on('onWebSocketConnect', event => {
       console.log('event.detail', event.detail)
       $('#connection').text('Connecting ...')
     })
 
-    window.listen('onWebSocketOpen', () => {
+    window.on('onWebSocketOpen', () => {
       this.onConnectionEstablished()
     })
 
-    window.listen('onWebSocketClosed', () => {
+    window.on('onWebSocketClosed', () => {
       this.onConnectionClosed()
     })
 
-    window.listen('onWebSocketMessage', event => {
+    window.on('onWebSocketMessage', event => {
       this.onDataReceived(event.detail)
     })
 
