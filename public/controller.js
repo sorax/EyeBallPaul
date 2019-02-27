@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 class Controller {
   constructor(wsAddress) {
-    this.player = {}
+    this.player = new Player()
 
     this.setEvents()
     this.webSocket = new WebSocketClient(wsAddress)
@@ -85,12 +85,6 @@ class Controller {
     window.on('onWebSocketMessage', event => {
       this.onDataReceived(event.detail)
     })
-
-    if (localStorage.getItem('playerName') !== '') {
-      this.player.name = localStorage.getItem('playerName')
-    } else {
-      this.player.name = ''
-    }
 
     var loginName = $('#login-name')
     var loginSend = $('#login-send')
