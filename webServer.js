@@ -8,7 +8,7 @@ let host
 
 app.get('/config.js', (req, res) => {
   res.set('Content-Type', 'text/javascript')
-  res.send(`const wsAddress = '${host}:${wsPort}';`)
+  res.send(`export const wsAddress = '${host}:${wsPort}'`)
 })
 
 app.use(express.static('public'))

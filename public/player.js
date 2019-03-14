@@ -1,6 +1,6 @@
 'use strict'
 
-class Player {
+export class Player {
   constructor() {
     this._deg = 0
     this._name = localStorage.getItem('playerName') || ''

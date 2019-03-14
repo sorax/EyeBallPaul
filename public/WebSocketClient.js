@@ -1,6 +1,6 @@
 'use strict'
 
-class WebSocketClient {
+export class WebSocketClient {
   constructor(wsAddress) {
     this.wsAddress = wsAddress
 
