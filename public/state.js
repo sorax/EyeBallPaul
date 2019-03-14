@@ -43,18 +43,23 @@ window.on('onStateChange', event => {
   console.log('state changed on path', event.detail)
 })
 
-function State() {
-  var data = {}
-
-  this.get = path => {
-    return !path
-      ? data
-      : path
-          .split('.')
-          .reduce((obj, key) => (obj && obj[key] ? obj[key] : undefined), data)
+class State {
+  constructor() {
+    this._data = {}
   }
 
-  this.set = (path, value) => {
+  get(path) {
+    return !path
+      ? this._data
+      : path
+          .split('.')
+          .reduce(
+            (obj, key) => (obj && obj[key] ? obj[key] : undefined),
+            this._data,
+          )
+  }
+
+  set(path, value) {
     if (JSON.stringify(value) !== JSON.stringify(this.get(path))) {
       window.emit('onStateChange', path)
 
@@ -62,7 +67,7 @@ function State() {
       const lastKey = keys.pop()
       const lastObj = keys.reduce(
         (obj, key) => (obj[key] = obj[key] || {}),
-        data,
+        this._data,
       )
       lastObj[lastKey] = value
     }
