@@ -1,49 +1,53 @@
 'use strict'
 
 import { Player } from './player.js'
-import { wsAddress } from './config.js'
 import { WebSocketClient } from './WebSocketClient.js'
 
-const player = new Player()
-
 document.addEventListener('DOMContentLoaded', () => {
-  const controller = new Controller(wsAddress)
+  new Controller()
 })
 
 class Controller {
-  constructor(wsAddress) {
+  constructor() {
     this.player = new Player()
     this.setEvents()
-    this.webSocket = new WebSocketClient(wsAddress)
+    this.webSocket = new WebSocketClient()
   }
 
   showConnectionScreen() {
     $('#connection').css('display', 'block')
   }
+
   hideConnectionScreen() {
     $('#connection').css('display', 'none')
   }
+
   showLoginScreen() {
     $('#login').css('display', 'block')
   }
+
   hideLoginScreen() {
     $('#login').css('display', 'none')
   }
+
   showPlayScreen() {
     $('#play').css('display', 'block')
   }
+
   sendClientType() {
     this.webSocket.send({
       type: 'setClientType',
       clientType: 'controller',
     })
   }
+
   onConnectionEstablished() {
-    console.log('onConnectionEstablished')
+    // console.log('ConnectionEstablished')
     this.hideConnectionScreen()
     this.showLoginScreen()
     this.sendClientType()
   }
+
   onDataReceived(data) {
     // console.log('Received: ', data)
     switch (data.type) {
@@ -52,31 +56,41 @@ class Controller {
         break
     }
   }
+
   onConnectionClosed() {
-    console.log('onConnectionClosed')
+    // console.log('ConnectionClosed')
     $('#connection').text('Reconnecting ...')
     this.showConnectionScreen()
-    this.this.hideLoginScreen()
+    this.hideLoginScreen()
   }
+
   setTeam(team) {
     this.player.team = team
     $('#login-send').attr('class', 'team' + this.player.team)
     $('#play-deg').attr('class', 'team' + this.player.team)
   }
+
   setEvents() {
-    window.on('onWebSocketConnect', event => {
-      console.log('event.detail', event.detail)
+    window.on('WebSocketConnecting', () => {
       $('#connection').text('Connecting ...')
     })
-    window.on('onWebSocketOpen', () => {
+
+    window.on('WebSocketReconnecting', event => {
+      $('#connection').text(`Reconnecting ... (${event.detail})`)
+    })
+
+    window.on('WebSocketOpen', () => {
       this.onConnectionEstablished()
     })
-    window.on('onWebSocketClosed', () => {
-      this.onConnectionClosed()
-    })
-    window.on('onWebSocketMessage', event => {
+
+    window.on('WebSocketMessage', event => {
       this.onDataReceived(event.detail)
     })
+
+    window.on('WebSocketClosed', () => {
+      this.onConnectionClosed()
+    })
+
     var loginName = $('#login-name')
     var loginSend = $('#login-send')
     loginName.val(this.player.name).focus()

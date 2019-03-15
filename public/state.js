@@ -39,7 +39,7 @@ window.emit = function(key, data) {
   }
 }
 
-window.on('onStateChange', event => {
+window.on('StateChange', event => {
   console.log('state changed on path', event.detail)
 })
 
@@ -61,7 +61,7 @@ class State {
 
   set(path, value) {
     if (JSON.stringify(value) !== JSON.stringify(this.get(path))) {
-      window.emit('onStateChange', path)
+      window.emit('StateChange', path)
 
       const keys = path.split('.')
       const lastKey = keys.pop()

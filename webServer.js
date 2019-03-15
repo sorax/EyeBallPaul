@@ -20,7 +20,8 @@ app.use((req, res, next) => {
 app.listen(httpPort, function() {
   const family = 'IPv4'
   // const family = this.address().family
-  const ip = '127.0.0.1'
+  // const ip = '127.0.0.1'
+  const ip = '192.168.0.12'
   // const ip = this.address().address
   const port = this.address().port
   host = family === 'IPv6' ? `[${ip}]` : `${ip}`

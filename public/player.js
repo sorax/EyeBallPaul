@@ -4,6 +4,7 @@ export class Player {
   constructor() {
     this._deg = 0
     this._name = localStorage.getItem('playerName') || ''
+    this._score = 0
     this._team
   }
 
@@ -24,6 +25,10 @@ export class Player {
 
   get name() {
     return this._name
+  }
+
+  score() {
+    this._score++
   }
 
   set team(team) {

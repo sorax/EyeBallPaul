@@ -29,7 +29,7 @@ class SocketServer {
       const id = req.headers['sec-websocket-key']
       // const ip = req.connection.remoteAddress;
 
-      // console.log(`New client connected (id: ${id})`)
+      console.log(`New client connected (id: ${id})`)
 
       this.connections[id] = {}
       // this.connections[id].ws = ws

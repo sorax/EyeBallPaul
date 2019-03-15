@@ -1,103 +1,58 @@
 'use strict'
 
-export class WebSocketClient {
-  constructor(wsAddress) {
-    this.wsAddress = wsAddress
+import { wsAddress } from './config.js'
 
-    this.reconnectTimeout
-    this.reconnectTime = 2000
-    this.reconnectCount = 0
+export class WebSocketClient {
+  constructor() {
+    this._reconnectTimeout
+    this._reconnectTime = 2000
+    this._reconnectCount = 0
+
+    this._socket = null
 
     this.connect()
-    this.setEvents()
   }
 
   connect() {
-    console.log('WebSocket Connect')
-    window.emit('onWebSocketConnect', JSON.parse(this.reconnectCount))
-    this.socket = new WebSocket('ws://' + this.wsAddress)
+    window.emit('WebSocketConnecting', { address: wsAddress })
+
+    this._socket = new WebSocket('ws://' + wsAddress)
+    this.setEvents()
+  }
+
+  reconnect() {
+    this._reconnectCount++
+    window.emit('WebSocketReconnecting', this._reconnectCount)
+
+    clearTimeout(this._reconnectTimeout)
+    this._reconnectTimeout = setTimeout(() => {
+      this.connect()
+    }, this._reconnectTime)
   }
 
   setEvents() {
-    this.socket.onopen = () => {
-      clearInterval(this.reconnectTimeout)
-      this.reconnectCount = 0
-      // console.log('WebSocket Open: (STATUS: ' + this.socket.readyState + ')')
-      // $('#connection').text('Connected')
-
-      window.emit('onWebSocketOpen')
+    this._socket.onopen = () => {
+      // console.log('WebSocket Open')
+      this._reconnectCount = 0
+      window.emit('WebSocketOpen', { status: this._socket.readyState })
     }
 
-    this.socket.onmessage = message => {
+    this._socket.onmessage = message => {
       // console.log(message)
-      const data = JSON.parse(message.data)
-      window.emit('onWebSocketMessage', data)
+      window.emit('WebSocketMessage', JSON.parse(message.data))
     }
 
-    this.socket.onerror = error => {
-      console.log('WebSocket Error')
-      console.log(error)
+    this._socket.onerror = error => {
+      window.emit('WebSocketError', error)
     }
 
-    this.socket.onclose = () => {
-      console.log('WebSocket Close')
-      window.emit('onWebSocketClosed')
-
-      this.reconnectTimeout = setInterval(
-        this.connect.bind(this),
-        this.reconnectTime,
-      )
+    this._socket.onclose = () => {
+      window.emit('WebSocketClosed')
+      this.reconnect()
     }
   }
+
   send(data) {
-    this.socket.send(JSON.stringify(data))
+    this._socket.send(JSON.stringify(data))
   }
 }
-
-// function WebSocketClient() {
-
-//   var setEvents = function () {
-//
-//     socket.onmessage = function (message) {
-//       //console.log('Received: %s', message.data);
-
-//       var data = JSON.parse(message.data);
-//       //console.log(data);
-
-//       controller.onDataReceived(data);
-//       //onMessage(data);
-//     };
-
-//     socket.onerror = function (error) {
-//       //console.log('WebSocket Error: ' + error);
-//     };
-
-//     socket.onclose = function () {
-//       //console.log('WebSocket Close');
-
-//       controller.onConnectionClosed();
-//       //onClose();
-//       reConnect();
-//     };
-//   };
-
-//   var reConnect = function () {
-//     clearTimeout(reconnectTimeout);
-//     reconnectCount++;
-
-//     //console.log('WebSocket ReConnect ('+reconnectCount+')');
-//     $('#connection').text('ReConnecting (' + reconnectCount + ')...');
-
-//     reconnectTimeout = setTimeout(function () {
-//       connect();
-//     }, reconnectTime);
-//   };
-
-//   var init = function () {
-//     //$('#connection').text('Connecting ...');
-//     connect();
-//   };
-
-//   // INIT
-//   init();
-// }
