@@ -1,6 +1,7 @@
 'use strict'
 
-import { Player } from './player.js'
+// import { Player } from './player.js'
+// const Player = require('./player.js')
 import { WebSocketClient } from './WebSocketClient.js'
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 class Controller {
   constructor() {
-    this.player = new Player()
+    this.playername
     this.setEvents()
     this.webSocket = new WebSocketClient()
   }
@@ -48,26 +49,11 @@ class Controller {
     this.sendClientType()
   }
 
-  onDataReceived(data) {
-    // console.log('Received: ', data)
-    switch (data.type) {
-      case 'setTeam':
-        this.setTeam(data.team)
-        break
-    }
-  }
-
   onConnectionClosed() {
     // console.log('ConnectionClosed')
     $('#connection').text('Reconnecting ...')
     this.showConnectionScreen()
     this.hideLoginScreen()
-  }
-
-  setTeam(team) {
-    this.player.team = team
-    $('#login-send').attr('class', 'team' + this.player.team)
-    $('#play-deg').attr('class', 'team' + this.player.team)
   }
 
   setEvents() {
@@ -84,7 +70,7 @@ class Controller {
     })
 
     window.on('WebSocketMessage', event => {
-      this.onDataReceived(event.detail)
+      console.log(event.detail)
     })
 
     window.on('WebSocketClosed', () => {
@@ -93,23 +79,23 @@ class Controller {
 
     var loginName = $('#login-name')
     var loginSend = $('#login-send')
-    loginName.val(this.player.name).focus()
+    loginName.val(this.playername).focus()
     loginName.on('keyup', event => {
       if (event.keyCode === 13) {
         loginSend.click()
       }
     })
     loginSend.on('click', () => {
-      this.player.name = loginName.val()
-      if (this.player.name === '') {
+      this.playername = loginName.val()
+      if (this.playername === '') {
         alert('Bitte Name ausfüllen')
       } else {
-        localStorage.setItem('playerName', this.player.name)
+        localStorage.setItem('playerName', this.playername)
         this.hideLoginScreen()
         this.showPlayScreen()
         this.webSocket.send({
           type: 'setName',
-          name: this.player.name,
+          name: this.playername,
         })
       }
     })

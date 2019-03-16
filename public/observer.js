@@ -1,7 +1,7 @@
 'use strict'
 
-import { Ball } from './ball.js'
-import { Player } from './player.js'
+// import { Ball } from './ball.js'
+// import { Player } from './player.js'
 import { WebSocketClient } from './WebSocketClient.js'
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -61,7 +61,6 @@ class Observer {
 
       case 'setGameState':
         // this.balls = data.balls
-        this.teams = data.teams
         this.players = data.players
 
         var playerDeg = 0
@@ -205,7 +204,6 @@ function getDegrees(degrees) {
 
 // function Observer () {
 
-// 	var teams = {};
 // 	var players = {};
 
 // function WebSocketClient () {
@@ -270,7 +268,7 @@ function getDegrees(degrees) {
 // 	// PUBLIC
 //
 // 	// PRIVATE
-// 	var teams = [];
+
 // 	var players = [];
 // 	var animationFrameId;
 //
@@ -312,7 +310,7 @@ function getDegrees(degrees) {
 
 //
 // var allDefenseSizePercent = 50;
-// var teamDefenceSizePercent = allDefenseSizePercent / 2;
+
 //
 
 //
@@ -338,7 +336,7 @@ function getDegrees(degrees) {
 // 		that.players.forEach(function (player, index) {
 // 			var playerPosition = player.deg;
 //
-// 			var playerSize = 360 / (100 / teamDefenceSizePercent); // => 90°
+
 // 			var playerOffset = playerSize / 2;	// => 45°
 //
 //
@@ -352,7 +350,6 @@ function getDegrees(degrees) {
 // 	this.name = name;
 // 	this.deg = deg;
 // 	this.color = 'rgba(0,176,111,0.7)';
-// 	//this.team = 1;
 // 	//this.points = 5;
 //
 // 	this.draw = function (context) {
@@ -524,7 +521,7 @@ function getDegrees(degrees) {
 // listHtml += '<li>' + player.name + '</li>';
 // });
 //
-// team1List.innerHTML = listHtml;
+
 // }
 //
 //

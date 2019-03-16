@@ -1,6 +1,6 @@
 'use strict'
 
-export class Ball {
+class Ball {
   constructor() {
     this._x = 0
     this._y = 0
@@ -10,3 +10,4 @@ export class Ball {
     // this._color = '#00f'
   }
 }
+module.exports = Ball

@@ -1,26 +1,16 @@
 const WebSocket = require('ws')
 
-class Ball {
-  constructor() {
-    this.x = 0
-    this.y = 0
-    this.deg = Math.random() * 360
-    this.speed = 1
-    this.lastCollision = null
-    // this.color = '#00f'
-  }
-}
+const Ball = require('./ball.js')
+const Player = require('./player.js')
 
 class SocketServer {
   constructor(wsPort) {
-    this.connections = {}
+    // this.connections = {}
     this.observers = {}
     this.players = {}
-    this.teams = { 1: {}, 2: {} }
     this.balls = [new Ball()]
 
-    this.allDefenseSizePercent = 50
-    this.teamDefenceSizePercent = this.allDefenseSizePercent / 2
+    this.totalDefenseSizePercent = 50
 
     console.log('SocketServer is now listening on port', wsPort)
 
@@ -31,7 +21,7 @@ class SocketServer {
 
       console.log(`New client connected (id: ${id})`)
 
-      this.connections[id] = {}
+      // this.connections[id] = {}
       // this.connections[id].ws = ws
 
       ws.on('message', message => {
@@ -42,59 +32,40 @@ class SocketServer {
 
         switch (data.type) {
           case 'setClientType':
-            this.connections[id].type = data.clientType
+            // this.connections[id].type = data.clientType
 
             if (data.clientType === 'controller') {
-              this.players[id] = this.connections[id]
-              this.players[id].points = 0
-              this.players[id].name = ''
-              this.players[id].deg = 0
+              const player = new Player()
+              player.id = id
 
-              if (
-                Object.keys(this.teams[1]).length <=
-                Object.keys(this.teams[2]).length
-              ) {
-                this.players[id].team = 1
-                this.teams[1][id] = this.players[id]
-              } else {
-                this.players[id].team = 2
-                this.teams[2][id] = this.players[id]
-              }
+              // player.defenceSize = 0
 
-              ws.send(
-                JSON.stringify({
-                  type: 'setTeam',
-                  team: this.players[id].team,
-                }),
-              )
-
-              // console.log(
-              //   `Teams are (${Object.keys(this.teams[1]).length}|${
-              //     Object.keys(this.teams[2]).length
-              //   })`,
-              // )
+              // this.players[id].points = 0
+              // this.players[id].name = ''
+              // this.players[id].deg = 0
+              // this.players[id] = player
             }
 
             if (data.clientType === 'observer') {
-              this.observers[id] = this.connections[id]
-              this.observers[id].ws = ws
+              // this.observers[id] = this.connections[id]
+              // this.observers[id].ws = ws
             }
 
             break
 
           case 'setName':
-            // console.log('set player name', data.name)
+            console.log('set player name', data.name)
             var name = data.name.toString()
-            //var pattern = /(\w|\d){8}/g;
-            //if (pattern.test(name)) {
             this.players[id].name = name
             this.players[id].defenceSize =
-              this.teamDefenceSizePercent /
-              Object.keys(this.teams[this.players[id].team]).length
-            //}
+              this.totalDefenseSizePercent / Object.keys(this.players).length
+
             break
 
           case 'setDeg':
+            console.log('set player deg', data.deg)
+            console.log('player name', this.players[id].name)
+
             this.players[id].deg = fixDegrees(parseInt(data.deg))
 
             // Broadcast to everyone else.
@@ -104,19 +75,19 @@ class SocketServer {
             //   }
             // })
 
-            for (var key in this.observers) {
-              var observer = this.observers[key]
-              // var player = this.players[id]
-              //var playerWs = player.ws;
-              //delete player.ws;
+            // for (var key in this.observers) {
+            //   var observer = this.observers[key]
+            //   // var player = this.players[id]
+            //   //var playerWs = player.ws;
+            //   //delete player.ws;
 
-              observer.ws.send(
-                JSON.stringify({
-                  type: 'updatePlayer',
-                  player: this.players[id],
-                }),
-              )
-            }
+            //   observer.ws.send(
+            //     JSON.stringify({
+            //       type: 'updatePlayer',
+            //       player: this.players[id],
+            //     }),
+            //   )
+            // }
             break
 
           case 'getGameState':
@@ -126,7 +97,6 @@ class SocketServer {
                 type: 'setGameState',
                 balls: this.balls,
                 players: this.players,
-                teams: this.teams,
               }),
             )
             break
@@ -135,11 +105,9 @@ class SocketServer {
       ws.on('close', () => {
         // console.log(id, this.connections)
         // console.log('Client disconnected (id: ' + id + ')')
-        delete this.connections[id] // remove from connections
+        // delete this.connections[id] // remove from connections
         delete this.observers[id]
         delete this.players[id]
-        delete this.teams[1][id]
-        delete this.teams[2][id]
 
         // if (Object.keys(players).length === 0) {
         //   clearInterval(tickInterval)
@@ -169,7 +137,7 @@ wss.on('connection', function (ws, req) {
 		console.log('Client disconnected (id: ' + id + ')');
 
 		if (connections[id].type === 'controller') {
-			delete teams[connections[id].team][id];	// remove from teams
+
 			delete players[id];	// remove from players
 		} else if (connections[id].type === 'observer') {
 			delete observers[id];	// remove from observers

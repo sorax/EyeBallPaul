@@ -1,9 +1,9 @@
 const wsPort = process.env.npm_package_config_ws_port
 
-const SocketServer = require('./socketServer.js')
+const SocketServer = require('./server/socketServer.js')
 new SocketServer(wsPort)
 
-require('./webServer.js')
+require('./server/webServer.js')
 
 // process.title = 'Server'
 // console.log(`
